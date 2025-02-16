@@ -1,0 +1,7 @@
+node_modules
+.env
+# Ignore SSL files
+*.pem
+*.crt
+*.key
+*.ca
