@@ -2,6 +2,8 @@ import { validationResult } from "express-validator"
 import Product from "../models/Product.js";
 import Category from "../models/Category.js";
 import ProductImageModel from "../models/ProductImage.js";
+import fs from 'fs'
+import axiosInstance from "../../client/src/utils/axiosInstance.js";
 
 const addProduct = async (req, res) => {
   try {
@@ -88,12 +90,11 @@ const editProduct = async (req, res) => {
     );
 
     if (!updated) {
-      return res.status(404).json({ success: false, message: "Product not found!" });
+      return res.json({ success: false, message: "Product not found!", status: 404 });
     }
 
     // If images are provided, delete old images and insert new ones
     if (images.length > 0) {
-      console.log("Received new images:", images);
 
       // Delete old images
       await ProductImageModel.destroy({ where: { product_id: productId } });
@@ -113,10 +114,16 @@ const editProduct = async (req, res) => {
   }
 };
 
+const fetchCategory = async (req, res) => {
+  let categories = await Category.findAll({})
+  res.json({ data: categories, message: "categories fetched", status: 200 })
 
+
+}
 
 export {
   addProduct,
   deleteProduct,
-  editProduct
+  editProduct,
+  fetchCategory
 }

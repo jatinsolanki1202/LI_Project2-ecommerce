@@ -1,5 +1,5 @@
 import express from 'express'
-import { createUser, handleLogin, homePage, logoutUser, addToCart, listCart } from '../controllers/user.controller.js'
+import { createUser, handleLogin, homePage, logoutUser, addToCart, listCart, handleCheckOut } from '../controllers/user.controller.js'
 import { body } from 'express-validator'
 import loginAuth from '../middlewares/loginAuth.js'
 
@@ -24,6 +24,8 @@ router.post('/login', [
 ], handleLogin)
 
 router.post('/cart/add', loginAuth, addToCart)
+
+router.post('/checkout', loginAuth, handleCheckOut)
 
 router.post('/logout', logoutUser)
 export default router

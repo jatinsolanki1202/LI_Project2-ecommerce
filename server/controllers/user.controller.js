@@ -6,6 +6,9 @@ import Product from '../models/Product.js'
 import Category from '../models/Category.js'
 import ProductImage from "../models/ProductImage.js";
 import Cart from "../models/Cart.js";
+import Order from "../models/Order.js";
+import OrderItem from "../models/OrderItem.js";
+import { where } from "sequelize";
 
 const createUser = async (req, res) => {
   try {
@@ -105,9 +108,15 @@ const logoutUser = (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
-    let userId = req.user.id;
-    if (!userId) return res.json({ success: false, message: "login to add product to cart" })
+    // let userId = req.user.id;
+    // if (!userId) return res.json({ success: false, message: "login to add product to cart" })
     let { product_id, quantity } = req.body;
+
+    let product = await Product.findOne({
+      where: { id: product_id }
+    })
+
+    if (product.stock < 1) return res.json({ success: false, message: "Not enough stock to add", status: 400 })
 
     let existingCartItem = await Cart.findOne({
       where: { user_id: userId, product_id: product_id }
@@ -165,4 +174,60 @@ const listCart = async (req, res) => {
   if (cart) return res.json({ cart, success: true, message: "fetched cart details" })
 }
 
-export { createUser, handleLogin, homePage, logoutUser, addToCart, listCart }
+const handleCheckOut = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const cartItems = await Cart.findAll({
+      where: { user_id: userId },
+      include: [{ model: Product }],
+    });
+
+    if (!cartItems.length) {
+      return res.json({ success: false, message: "Cart is empty", status: 400 });
+    }
+
+    let totalAmount = 0;
+
+    // total amount calculation
+    cartItems.forEach((item) => {
+      totalAmount += item.quantity * item.Product.price;
+    });
+
+    const order = await Order.create({
+      user_id: userId,
+      total_amount: totalAmount,
+      status: "Pending",
+    });
+
+    const orderItems = cartItems.map((item) => ({
+      order_id: order.id,
+      product_id: item.product_id,
+      product_name: item.Product.name,
+      quantity: item.quantity,
+      price: item.Product.price
+    }));
+
+    await OrderItem.bulkCreate(orderItems);
+
+    // delete cart
+    await Cart.destroy({ where: { user_id: userId } });
+
+    // Decrement stock for all purchased products
+    await Promise.all(
+      orderItems.map(async (item) => {
+        await Product.decrement("stock", { by: item.quantity, where: { id: item.product_id } });
+      })
+    );
+
+    return res.json({ success: true, message: "Order placed successfully", order_id: order.id });
+
+  } catch (error) {
+    console.error("Checkout error:", error);
+    res.json({ success: false, message: "Checkout failed", status: 500 });
+  }
+};
+
+
+
+export { createUser, handleLogin, homePage, logoutUser, addToCart, listCart, handleCheckOut }

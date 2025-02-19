@@ -5,13 +5,14 @@ import { MdDelete } from "react-icons/md";
 import { toast } from "react-hot-toast";
 
 const Cart = () => {
-  const { token } = useContext(storeContext);
+  const { token, fetchToken } = useContext(storeContext);
   const [cartItems, setCartItems] = useState([]);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
-  // Fetch cart items
   const fetchCartItems = async () => {
     if (!token) {
       setIsLoading(false);
@@ -34,12 +35,11 @@ const Cart = () => {
     }
   };
 
-  // Fetch cart items when component mounts and when token updates
   useEffect(() => {
+    fetchToken()
     fetchCartItems();
-  }, [token]); // Runs when token changes
+  }, [token]);
 
-  // Calculate totals
   const calculateTotal = (items) => {
     let totalQty = 0;
     let totalAmt = 0;
@@ -51,19 +51,50 @@ const Cart = () => {
     setTotalAmount(totalAmt);
   };
 
-  // Remove from cart
-  const removeFromCart = async (productId) => {
+  const confirmRemoveFromCart = (productId) => {
+    setSelectedProductId(productId);
+    setShowModal(true);
+  };
+
+  const removeFromCart = async () => {
     try {
-      const response = await axiosInstance.delete(`/cart/remove/${productId}`, {
+      const response = await axiosInstance.delete(`/cart/remove/${selectedProductId}`, {
         headers: { token },
       });
-      if (response.data.success) {
+
+      if (response.data.message === "session timed out. Please login again") {
+        localStorage.removeItem("token");
+        toast.error(response.data.message);
+        fetchCartItems();
+      } else if (response.data.success) {
         toast.success(response.data.message);
-        fetchCartItems(); // Refresh cart after removal
+        fetchCartItems();
+      } else {
+        toast.error(response.data.message);
       }
     } catch (error) {
       console.error("Error removing item from cart:", error);
       toast.error("Failed to remove item from cart");
+    } finally {
+      setShowModal(false);
+      setSelectedProductId(null);
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const response = await axiosInstance.post("/user/checkout", {}, {
+        headers: { token }
+      });
+      if (response.data.success) {
+        toast.success("Order placed successfully!");
+        fetchCartItems();
+      } else {
+        toast.error(response.data.message || "Checkout failed");
+      }
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      toast.error("Checkout failed. Please try again.");
     }
   };
 
@@ -104,7 +135,7 @@ const Cart = () => {
                 ₹{item.Product.price * item.quantity}
               </p>
               <button
-                onClick={() => removeFromCart(item.product_id)}
+                onClick={() => confirmRemoveFromCart(item.product_id)}
                 className="bg-red-500 hover:bg-red-700 cursor-pointer rounded-full text-white px-3 py-3"
               >
                 <MdDelete />
@@ -120,6 +151,38 @@ const Cart = () => {
               Total Amount:{" "}
               <span className="font-bold text-green-400">₹{totalAmount}</span>
             </p>
+            <button
+              onClick={handleCheckout}
+              className="w-full bg-green-500 hover:bg-green-600 text-white text-lg font-semibold py-2 mt-4 rounded-lg"
+            >
+              Checkout
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900">
+              Confirm Deletion
+            </h2>
+            <p className="text-gray-700">Are you sure you want to remove this item from your cart?</p>
+            <div className="mt-5 flex justify-center gap-4">
+              <button
+                onClick={removeFromCart}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
+              >
+                Yes, Remove
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

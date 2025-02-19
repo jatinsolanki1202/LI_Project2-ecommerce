@@ -8,7 +8,7 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const { token } = useContext(storeContext)
+  const { token, fetchToken } = useContext(storeContext)
 
 
 
@@ -17,6 +17,7 @@ const Home = () => {
       const response = await axiosInstance.get(`/user/home`);
 
       setProducts(response.data.data);
+
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -49,22 +50,54 @@ const Home = () => {
 
   const addToCart = async (product, quantity) => {
     try {
-      let response = await axiosInstance.post('/user/cart/add', {
-        product_id: product.id, quantity
-      }, {
-        headers: { token }
-      })
-      if (response.data.success) toast.success("Added to cart successfully")
+      if (!token) {
+        toast.error("Please log in to add items to your cart.");
+        return;
+      }
 
+      // Fetch user's cart to check the current quantity of the product
+      const cartResponse = await axiosInstance.get("/user/cart", {
+        headers: { token },
+      });
 
+      const cartItems = cartResponse.data.cart || [];
+      const cartItem = cartItems.find((item) => item.product_id === product.id);
+      const currentCartQuantity = cartItem ? cartItem.quantity : 0;
+
+      // Check if adding the new quantity exceeds stock
+      if (currentCartQuantity + quantity > product.stock) {
+        toast.error("Not enough stock available!");
+        return;
+      }
+
+      const response = await axiosInstance.post(
+        "/user/cart/add",
+        { product_id: product.id, quantity },
+        { headers: { token } }
+      );
+
+      if (response.data.message == "session timed out. Please login again") {
+        localStorage.removeItem("token")
+        toast.error(response.data.message)
+      } else if (response.data.success) {
+        toast.success("Added to cart successfully");
+      } else {
+        toast.error(response.data.message);
+      }
     } catch (err) {
-      console.log(err.message)
+      console.log("Error adding to cart:", err.message);
+      toast.error("Failed to add item to cart.");
     }
   };
+
+
+
   useEffect(() => {
+    fetchToken()
     fetchProducts();
     fetchCategories();
   }, []);
+
   const filteredProducts = selectedCategory
     ? products.filter((product) => product.category_id === selectedCategory)
     : products;

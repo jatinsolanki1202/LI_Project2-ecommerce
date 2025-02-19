@@ -56,7 +56,7 @@ const Products = () => {
       cart.push({ ...product, quantity: 1 });
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
+    // localStorage.setItem("cart", JSON.stringify(cart));
     alert(`${product.name} added to cart!`);
   };
 

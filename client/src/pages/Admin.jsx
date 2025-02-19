@@ -2,24 +2,37 @@ import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { storeContext } from "../context/storeContext.jsx";
-import axios from "axios";
 import toast from "react-hot-toast";
 
 const AdminPanel = () => {
   const { token, url, fetchToken } = useContext(storeContext)
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([])
   const [formData, setFormData] = useState({
     name: "", description: "",
     price: "", stock: "", images: null, category: "Smartphones"
   });
   const [editingProduct, setEditingProduct] = useState(null);
 
-  const categories = ["Smartphones", "Laptops", "Earphones"];
+  const fetchCategories = async () => {
+    const response = await axiosInstance.get('/admin/category', {
+      headers: { token }
+    });
+
+    setCategories(response.data.data)
+
+  }
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts()
+    fetchCategories()
+  }, [])
 
+
+  useEffect(() => {
+    console.log(formData)
+
+  }, [formData])
   const fetchProducts = async () => {
     try {
       const response = await axiosInstance.get("/products");
@@ -56,7 +69,6 @@ const AdminPanel = () => {
         formDataObj.append("images", formData.images[i]);
       }
     }
-
 
     try {
       if (editingProduct) {
@@ -98,8 +110,6 @@ const AdminPanel = () => {
       images: null,
     });
 
-    console.log(formData);
-
   };
 
   const handleDelete = async (id) => {
@@ -138,7 +148,7 @@ const AdminPanel = () => {
           <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} placeholder="Stock" className="p-2 border border-gray-600 rounded bg-gray-700 text-white" required />
           <select name="category" value={formData.category} onChange={handleInputChange} className="p-2 border border-gray-600 rounded bg-gray-700 text-white">
             {categories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
           </select>
           <input type="file" name="images" onChange={handleInputChange} className="p-2 border border-gray-600 rounded bg-gray-700 text-white" required={!editingProduct} multiple />
