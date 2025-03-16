@@ -10,7 +10,7 @@ const AdminPanel = () => {
   const [categories, setCategories] = useState([])
   const [formData, setFormData] = useState({
     name: "", description: "",
-    price: "", stock: "", images: null, category: "Smartphones"
+    price: "", stock: "", images: null, category: ""
   });
   const [editingProduct, setEditingProduct] = useState(null);
 
@@ -18,6 +18,8 @@ const AdminPanel = () => {
     const response = await axiosInstance.get('/admin/category', {
       headers: { token }
     });
+
+    console.log(response.data.data);
 
     setCategories(response.data.data)
 
@@ -44,6 +46,7 @@ const AdminPanel = () => {
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: files ? files : value,
@@ -56,13 +59,13 @@ const AdminPanel = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataObj = new FormData();
+    console.log(formData.category, "---oo");
+
     formDataObj.append("name", formData.name);
     formDataObj.append("description", formData.description);
     formDataObj.append("price", formData.price);
     formDataObj.append("stock", formData.stock);
-    formDataObj.append("category", formData.category);
-
-    console.log(formData.category);
+    formDataObj.append("category", formData?.category != "" ? formData.category : "1");
 
     if (formData.images && formData.images.length > 0) {
       for (let i = 0; i < formData.images.length; i++) {
@@ -83,13 +86,18 @@ const AdminPanel = () => {
 
       } else {
         let response = await axiosInstance.post("/admin/add-product", formDataObj, {
+          "Content-Type": "multipart/form-data",
           headers: { token }
         });
 
+        if (response.data.message == "session timed out. Please login again") {
+          localStorage.removeItem("token")
+          fetchToken()
+        }
         if (response.data.success) toast.success(response.data.message)
         else toast.error(response.data.message)
       }
-      setFormData({ name: "", description: "", price: "", stock: "", images: null, category: "Smartphones" });
+      setFormData({ name: "", description: "", price: "", stock: "", images: null, category: "" });
       setEditingProduct(null);
       fetchProducts();
     } catch (error) {
@@ -101,12 +109,14 @@ const AdminPanel = () => {
 
   const handleEdit = (product) => {
     setEditingProduct(product);
+    console.log(product.Category.name, "product...");
+
     setFormData({
       name: product.name || "",
       description: product.description || "",
       price: product.price || "",
       stock: product.stock || "",
-      category: product.category || "Smartphones",
+      category: product.Category.name,
       images: null,
     });
 

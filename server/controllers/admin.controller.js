@@ -16,7 +16,7 @@ const addProduct = async (req, res) => {
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const categoryRecord = await Category.findOne({ where: { name: category } });
+    const categoryRecord = await Category.findOne({ where: { id: category } });
 
     if (!categoryRecord) {
       return res.status(404).json({ message: "Category not found!" });

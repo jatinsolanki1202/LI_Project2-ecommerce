@@ -16,7 +16,7 @@ const productController = async (req, res) => {
       include: [{
         model: ProductImage
       },
-      { model: categoryModel }
+      { model: categoryModel, attributes: ["id", "name"] }
       ]
     });
 

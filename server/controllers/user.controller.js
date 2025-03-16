@@ -108,8 +108,8 @@ const logoutUser = (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
-    // let userId = req.user.id;
-    // if (!userId) return res.json({ success: false, message: "login to add product to cart" })
+    let userId = req.user.id;
+    if (!userId) return res.json({ success: false, message: "login to add product to cart" })
     let { product_id, quantity } = req.body;
 
     let product = await Product.findOne({

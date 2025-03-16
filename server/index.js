@@ -9,6 +9,7 @@ import cartRoutes from './routes/cart.routes.js';
 import categoriesController from './controllers/categories.controller.js'
 import productController from './controllers/product.controller.js';
 import syncDatabase from './sync.js';
+syncDatabase()
 // import syncDatabase from './sync.js'
 
 const app = express()
