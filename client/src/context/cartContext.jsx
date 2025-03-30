@@ -1,19 +1,37 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import axiosInstance from "../utils/axiosInstance";
+import { storeContext } from "./storeContext";
 
-export const cartContext = createContext(null)
-
-const ContextProvider = ({ children }) => {
-
+export const CartContext = createContext(null)
 
 
-  const contextValue = {}
+const CartContextProvider = ({ children }) => {
+  const { token } = useContext(storeContext);
+
+  const [cart, setCart] = useState([])
+  const [cartLength, setCartLength] = useState(0)
+
+  const fetchCart = async () => {
+    const response = await axiosInstance.get('/cart', { headers: { token } })
+
+    setCart(response.data.data)
+
+    setCartLength(response.data.data.length)
+
+
+  }
+
+  useEffect(() => {
+    fetchCart()
+
+  }, [])
+  const contextValue = { cart, fetchCart, cartLength }
 
   return (
-    <storeContext.Provider value={contextValue}>
+    <CartContext.Provider value={contextValue}>
       {children}
-    </storeContext.Provider>
+    </CartContext.Provider>
   )
 }
 
-export { ContextProvider }
+export { CartContextProvider }

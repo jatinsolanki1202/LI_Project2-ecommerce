@@ -11,7 +11,7 @@ const ContextProvider = ({ children }) => {
     if (localStorage.getItem("token")) {
       setToken(localStorage.getItem("token"))
     } else {
-      setToken()
+      setToken("")
     }
   }
 

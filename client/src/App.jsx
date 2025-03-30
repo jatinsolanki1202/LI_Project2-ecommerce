@@ -7,22 +7,30 @@ import Navbar from './components/Navbar.jsx'
 import { Toaster } from 'react-hot-toast'
 import Products from './pages/Products.jsx'
 import Cart from './pages/Cart.jsx'
-import Admin from './pages/Admin.jsx'
+import Admin from './pages/AdminProductPage.jsx'
+import AdminLogin from './pages/AdminLogin.jsx'
+import AdminPanel from './pages/AdminPanel.jsx'
+import AdminProductPage from './pages/AdminProductPage.jsx'
 
 function App() {
+
   const location = useLocation();
   return (
-    <div className='bg-[#292929] min-h-screen'>
-      <Toaster />
-      {location.pathname !== '/user/login' && <Navbar />}
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/user/login' element={<LoginPage />} />
-        <Route path='/products' element={<Products />} />
-        <Route path='/cart' element={<Cart />} />
-        <Route path='/admin' element={<Admin />} />
-      </Routes>
-    </div>
+    <>
+      {location.pathname !== '/user/logins' && <Navbar />}
+      <div className='min-h-screen px-10 bg-[#f9f9f9]' >
+        <Toaster />
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/user/login' element={<LoginPage />} />
+          <Route path='/products' element={<Products />} />
+          <Route path='/cart' element={<Cart />} />
+          <Route path='/admin' element={<AdminPanel />} />
+          <Route path='/admin/login' element={<AdminLogin />} />
+          <Route path='/admin/products' element={<AdminProductPage />} />
+        </Routes>
+      </div>
+    </>
   )
 }
 

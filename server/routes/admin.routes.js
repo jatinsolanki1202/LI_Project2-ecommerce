@@ -1,5 +1,5 @@
 import express from 'express'
-import { addProduct, deleteProduct, editProduct, fetchCategory } from '../controllers/admin.controller.js'
+import { addProduct, deleteProduct, editProduct, fetchCategory, handleAdminLogin } from '../controllers/admin.controller.js'
 import { body, check } from 'express-validator'
 import adminAuth from '../middlewares/adminAuth.js'
 import loginAuth from '../middlewares/loginAuth.js'
@@ -26,6 +26,12 @@ router.post('/add-product', loginAuth, adminAuth('admin'), [
   // check("stock").notEmpty().withMessage("stock is required"),
   // check("category").notEmpty().withMessage("category is required"),
 ], upload.array("images"), addProduct)
+
+router.post('/login', [
+  body("email").notEmpty().withMessage("email is required"),
+  body("email").isEmail().withMessage("Invalid email"),
+  body("password").notEmpty().withMessage("password is required")
+], handleAdminLogin)
 
 router.get('/category', fetchCategory)
 

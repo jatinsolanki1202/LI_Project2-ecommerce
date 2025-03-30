@@ -4,7 +4,43 @@ import Category from "../models/Category.js";
 import ProductImageModel from "../models/ProductImage.js";
 import fs from 'fs'
 import axiosInstance from "../../client/src/utils/axiosInstance.js";
+import userModel from "../models/User.js";
+import dbConnection from '../config/db.js'
+import { comparePassword } from "../utils/bcrypt.js";
+import { createToken } from "../utils/jwt.js";
 
+const handleAdminLogin = async (req, res) => {
+  try {
+    //validation check
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.json({ success: false, message: errors.array()[0].msg });
+    }
+    let { email, password } = req.body
+
+    let user = await userModel.findOne({
+      where: { email, role: 'admin' }
+    })
+
+    if (!user) return res.json({ success: false, data: null, message: "Not an admin email", status: 400 })
+
+    let isValidPassword = await comparePassword(password, user.password)
+    if (!isValidPassword) return res.json({ success: false, data: null, message: "Incorrect email or password", status: 400 })
+
+    // token creation
+    const token = createToken(user.id, user.role)
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true, // Use true in production (only allows HTTPS)
+      sameSite: "Strict",
+    });
+    return res.json({ success: true, data: user, message: "Logged in successfully", status: 200, token })
+
+  } catch (err) {
+    console.log(err.message);
+
+  }
+}
 const addProduct = async (req, res) => {
   try {
     let { name, price, description, stock, category } = req.body;
@@ -16,7 +52,7 @@ const addProduct = async (req, res) => {
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const categoryRecord = await Category.findOne({ where: { id: category } });
+    const categoryRecord = await Category.findOne({ where: { name: category } });
 
     if (!categoryRecord) {
       return res.status(404).json({ message: "Category not found!" });
@@ -89,8 +125,8 @@ const editProduct = async (req, res) => {
       { where: { id: productId } }
     );
 
-    if (!updated) {
-      return res.json({ success: false, message: "Product not found!", status: 404 });
+    if (updated == 0 || updated == '0') {
+      return res.json({ success: true, message: "No changes detected, product saved", status: 200 });
     }
 
     // If images are provided, delete old images and insert new ones
@@ -125,5 +161,6 @@ export {
   addProduct,
   deleteProduct,
   editProduct,
-  fetchCategory
+  fetchCategory,
+  handleAdminLogin
 }
