@@ -8,13 +8,17 @@ const Home = () => {
   const url = "http://127.0.0.1:8000";
   const [products, setProducts] = useState([]);
   const { token, fetchToken } = useContext(storeContext);
-  const { fetchCart } = useContext(CartContext)
+  const { fetchCart, cart } = useContext(CartContext)
 
   useEffect(() => {
     fetchToken();
     fetchProducts();
     fetchCart()
   }, []);
+
+  useEffect(() => {
+    fetchCart()
+  }, [cart])
 
   const fetchProducts = async () => {
     try {
@@ -25,29 +29,48 @@ const Home = () => {
     }
   };
 
-  const addToCart = async (product) => {
-    // fetchToken()
-    if (!token) {
-      toast.error("Please log in to add items to your cart.");
-      return;
-    }
+  const addToCart = async (product, quantity) => {
     try {
+      if (!token) {
+        toast.error("Please log in to add items to your cart.");
+        return;
+      }
+
+      // Fetch user's cart to check the current quantity of the product
+      const cartResponse = await axiosInstance.get("/user/cart", {
+        headers: { token },
+      });
+
+      const cartItems = cartResponse.data.cart || [];
+      const cartItem = cartItems.find((item) => item.product_id === product.id);
+      const currentCartQuantity = cartItem ? cartItem.quantity : 0;
+
+      // Check if adding the new quantity exceeds stock
+      if (currentCartQuantity + quantity > product.stock) {
+        toast.error("Not enough stock available!");
+        return;
+      }
+
       const response = await axiosInstance.post(
-        "/user/cart/add",
-        { product_id: product.id, quantity: 1 },
-        { headers: { token } }
+          "/user/cart/add",
+          { product_id: product.id, quantity },
+          { headers: { token } }
       );
-      if (response.data.success) {
+
+      if (response.data.message == "session timed out. Please login again") {
+        localStorage.removeItem("token")
+        toast.error(response.data.message)
+      } else if (response.data.success) {
         toast.success("Added to cart successfully");
-        fetchCart()
       } else {
         toast.error(response.data.message);
       }
     } catch (err) {
-      console.error("Error adding to cart:", err);
+      console.log("Error adding to cart:", err.message);
       toast.error("Failed to add item to cart.");
     }
   };
+
 
   return (
     <div className="bg-[#f9f9f9] text-gray-900 min-h-screen">
@@ -69,8 +92,9 @@ const Home = () => {
                 <h3 className="text-lg font-semibold truncate">{product.name}</h3>
                 <p className="text-gray-600 text-sm line-clamp-2">{product.description}</p>
                 <p className="text-xl text-green-600 font-semibold">₹{product.price}</p>
+                <p className="text-xs text-gray-500 font-semibold">Stock: {product.stock}</p>
                 <button
-                  onClick={() => addToCart(product)}
+                  onClick={() => addToCart(product, 1)}
                   className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
                 >
                   Add to Cart

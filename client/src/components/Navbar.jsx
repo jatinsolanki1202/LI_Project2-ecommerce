@@ -9,6 +9,7 @@ import cartIcon from '../assets/images/cart_icon.png';
 import menuIcon from '../assets/images/menu_icon.png';
 import dropdownIcon from '../assets/images/dropdown_icon.png';
 import { CartContext } from "../context/CartContext.jsx";
+import SearchBar from "./SearchBar.jsx";
 
 const Navbar = () => {
   const { token, setToken, fetchToken } = useContext(storeContext);
@@ -17,6 +18,7 @@ const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
   const [userRole, setUserRole] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -69,7 +71,7 @@ const Navbar = () => {
           <p>Home</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/collection" className="flex flex-col items-center gap-1 px-3 py-2  rounded-lg hover:text-gray-700 hover:rounded-lg hover:bg-gray-100 transition duration-400">
+        <NavLink to="/products" className="flex flex-col items-center gap-1 px-3 py-2  rounded-lg hover:text-gray-700 hover:rounded-lg hover:bg-gray-100 transition duration-400">
           <p>Collection</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
@@ -85,8 +87,16 @@ const Navbar = () => {
 
       <ul>
         <div className="flex items-center gap-6">
-          <img src={searchIcon} className="w-5 cursor-pointer" alt="Search" />
-
+          <img
+              src={searchIcon}
+              className="w-5 cursor-pointer"
+              alt="Search"
+              onClick={() => setIsSearchOpen(true)}
+          />
+          <SearchBar
+              isOpen={isSearchOpen}
+              onClose={() => setIsSearchOpen(false)}
+          />
           {/* Profile Dropdown */}
           <div className="group relative">
             <img src={profileIcon} className="w-5 cursor-pointer" alt="Profile" />

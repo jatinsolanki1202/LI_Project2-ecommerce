@@ -11,6 +11,8 @@ import Admin from './pages/AdminProductPage.jsx'
 import AdminLogin from './pages/AdminLogin.jsx'
 import AdminPanel from './pages/AdminPanel.jsx'
 import AdminProductPage from './pages/AdminProductPage.jsx'
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
 
 function App() {
 
@@ -28,6 +30,8 @@ function App() {
           <Route path='/admin' element={<AdminPanel />} />
           <Route path='/admin/login' element={<AdminLogin />} />
           <Route path='/admin/products' element={<AdminProductPage />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/contact' element={<Contact />} />
         </Routes>
       </div>
     </>

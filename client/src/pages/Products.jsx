@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance.js";
 import { storeContext } from "../context/storeContext.jsx";
 import toast from "react-hot-toast";
+import {CartContext} from "../context/CartContext.jsx";
 
 const Products = () => {
   const url = "http://127.0.0.1:8000";
@@ -9,9 +10,11 @@ const Products = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const { token, fetchToken } = useContext(storeContext)
+  const { fetchCart, cart } = useContext(CartContext)
 
-
-
+  useEffect(() => {
+    fetchCart()
+  }, [cart]);
   const fetchProducts = async () => {
     try {
       const response = await axiosInstance.get(`/user/home`);
@@ -103,14 +106,14 @@ const Products = () => {
     : products;
 
   return (
-    <div className="p-10 bg-gray-900 text-white min-h-screen">
+    <div className="p-10 bg-[#f9f9f9] text-black min-h-screen">
 
       <div className="mb-5">
-        <label className="text-white text-lg font-semibold">Select Category</label>
+        <label className="text-black text-lg font-semibold">Select Category</label>
         <select
           value={selectedCategory}
           onChange={handleCategoryChange}
-          className="w-full p-2 border border-gray-400 bg-gray-800 text-white rounded"
+          className="w-full p-2 border border-gray-400 bg-[#f9f9f9] text-black rounded"
         >
           <option value="">All Categories</option>
           {categories.map((category) => (
