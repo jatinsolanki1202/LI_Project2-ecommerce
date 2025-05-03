@@ -55,15 +55,15 @@ const Contact = () => {
                         <div className="space-y-4">
                             <div>
                                 <h3 className="text-lg font-medium mb-2">Address</h3>
-                                <p className="text-gray-600">123 Shopping Street, Commerce City, 12345</p>
+                                <p className="text-gray-600">225, Hiranandani Signature, GIFT city, Gandhinagar</p>
                             </div>
                             <div>
                                 <h3 className="text-lg font-medium mb-2">Email</h3>
-                                <p className="text-gray-600">support@yourecommerce.com</p>
+                                <p className="text-gray-600">support@shopfinity.com</p>
                             </div>
                             <div>
                                 <h3 className="text-lg font-medium mb-2">Phone</h3>
-                                <p className="text-gray-600">+1 (555) 123-4567</p>
+                                <p className="text-gray-600"><a className='text-blue-600' href='tel:9870017748'>+91 9870017748</a></p>
                             </div>
                         </div>
                     </div>

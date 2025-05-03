@@ -97,8 +97,10 @@ const Cart = () => {
       if (response.data.success) {
         toast.success("Order placed successfully!");
         fetchCartItems();
+        fetchCart()
       } else {
         toast.error(response.data.message || "Checkout failed");
+        fetchCart()
       }
     } catch (error) {
       console.error("Error during checkout:", error);

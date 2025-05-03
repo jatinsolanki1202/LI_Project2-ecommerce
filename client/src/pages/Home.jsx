@@ -8,7 +8,7 @@ const Home = () => {
   const url = "http://127.0.0.1:8000";
   const [products, setProducts] = useState([]);
   const { token, fetchToken } = useContext(storeContext);
-  const { fetchCart, cart } = useContext(CartContext)
+  const { fetchCart, cart, cartItems } = useContext(CartContext)
 
   useEffect(() => {
     fetchToken();
@@ -16,9 +16,9 @@ const Home = () => {
     fetchCart()
   }, []);
 
-  useEffect(() => {
-    fetchCart()
-  }, [cart])
+  // useEffect(() => {
+  //   fetchCart()
+  // }, [cartItems])
 
   const fetchProducts = async () => {
     try {
@@ -60,10 +60,16 @@ const Home = () => {
       if (response.data.message == "session timed out. Please login again") {
         localStorage.removeItem("token")
         toast.error(response.data.message)
+    fetchCart()
+
       } else if (response.data.success) {
         toast.success("Added to cart successfully");
+    fetchCart()
+
       } else {
         toast.error(response.data.message);
+    fetchCart()
+
       }
     } catch (err) {
       console.log("Error adding to cart:", err.message);

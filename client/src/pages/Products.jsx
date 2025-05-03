@@ -14,7 +14,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchCart()
-  }, [cart]);
+  }, []);
   const fetchProducts = async () => {
     try {
       const response = await axiosInstance.get(`/user/home`);
@@ -82,10 +82,16 @@ const Products = () => {
       if (response.data.message == "session timed out. Please login again") {
         localStorage.removeItem("token")
         toast.error(response.data.message)
+    fetchCart()
+
       } else if (response.data.success) {
         toast.success("Added to cart successfully");
+    fetchCart()
+
       } else {
         toast.error(response.data.message);
+    fetchCart()
+
       }
     } catch (err) {
       console.log("Error adding to cart:", err.message);
