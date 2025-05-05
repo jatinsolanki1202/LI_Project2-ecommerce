@@ -20,30 +20,30 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false)
   const navigate = useNavigate();
-    // const checkLoginStatus = async () => {
-    //   try {
-    //     fetchToken()
-    //     if (!token) {
-    //       setIsLoggedIn(false);
-    //       setUserRole("");
-    //       return;
-    //     }
-    //
-    //     const response = await axiosInstance.get("/user/home");
-    //     setIsLoggedIn(response.status === 200);
-    //     if (response.data.user) {
-    //       setUserRole(response.data.user?.role);
-    //     }
-    //     console.log(response.data, " ----")
-    //     if(response.data.user?.role == "admin") {
-    //       setIsAdmin(true)
-    //     }
-    //   } catch (error) {
-    //     setIsLoggedIn(false);
-    //     setUserRole("");
-    //     console.log("login error => ", error.message)
-    //   }
-    // };
+    const checkLogin = async () => {
+      try {
+        fetchToken()
+        if (!token) {
+          setIsLoggedIn(false);
+          setUserRole("");
+          return;
+        }
+
+        const response = await axiosInstance.get("/user/home");
+        setIsLoggedIn(response.status === 200);
+        if (response.data.user) {
+          setUserRole(response.data.user?.role);
+        }
+        console.log(response.data, " ----")
+        if(response.data.user?.role == "admin") {
+          setIsAdmin(true)
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+        setUserRole("");
+        console.log("login error => ", error.message)
+      }
+    };
 
     const checkLoginStatus = async () => {
       let response = await axiosInstance.get('/check/login-status', {
@@ -51,7 +51,11 @@ const Navbar = () => {
           Authorization: `Bearer ${token}`
         }
       })
-      console.log(response.data, " ----")
+      if(response.data.role == "admin") {
+        navigate("/admin")
+      } else {
+        navigate("/admin/login")
+      }
     }
 
   const handleAdminClick = async (e) => {
@@ -73,7 +77,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    checkLoginStatus();
+    checkLogin();
   }, [token]); // Runs when `token` changes
 
   useEffect(() => {
@@ -116,7 +120,7 @@ const Navbar = () => {
           <p>Contact</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/admin" className="flex flex-col items-center justify-center gap-1 px-3 py-1  rounded-4xl hover:text-gray-700 hover:rounded-4xl hover:bg-gray-100 transition duration-400 border-2">
+        <NavLink onClick={checkLoginStatus} className="flex flex-col items-center justify-center gap-1 px-3 py-1  rounded-4xl hover:text-gray-700 hover:rounded-4xl hover:bg-gray-100 transition duration-400 border-2">
           <p>Admin</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>

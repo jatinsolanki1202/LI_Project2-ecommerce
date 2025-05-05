@@ -16,7 +16,7 @@ const CartContextProvider = ({ children }) => {
 
     setCart(response.data.data)
     console.log(cart)
-    setCartLength(response.data.data.length)
+    setCartLength(response.data.data?.length)
 
 
   }
