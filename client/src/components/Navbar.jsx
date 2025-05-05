@@ -8,38 +8,71 @@ import profileIcon from '../assets/images/profile_icon.png';
 import cartIcon from '../assets/images/cart_icon.png';
 import menuIcon from '../assets/images/menu_icon.png';
 import dropdownIcon from '../assets/images/dropdown_icon.png';
-import { CartContext } from "../context/CartContext.jsx";
+import { CartContext,  } from "../context/CartContext.jsx";
 import SearchBar from "./SearchBar.jsx";
 
 const Navbar = () => {
   const { token, setToken, fetchToken } = useContext(storeContext);
   const { cart, fetchCart, cartLength } = useContext(CartContext)
-  const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
   const [userRole, setUserRole] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false)
+  const navigate = useNavigate();
+    // const checkLoginStatus = async () => {
+    //   try {
+    //     fetchToken()
+    //     if (!token) {
+    //       setIsLoggedIn(false);
+    //       setUserRole("");
+    //       return;
+    //     }
+    //
+    //     const response = await axiosInstance.get("/user/home");
+    //     setIsLoggedIn(response.status === 200);
+    //     if (response.data.user) {
+    //       setUserRole(response.data.user?.role);
+    //     }
+    //     console.log(response.data, " ----")
+    //     if(response.data.user?.role == "admin") {
+    //       setIsAdmin(true)
+    //     }
+    //   } catch (error) {
+    //     setIsLoggedIn(false);
+    //     setUserRole("");
+    //     console.log("login error => ", error.message)
+    //   }
+    // };
+
+    const checkLoginStatus = async () => {
+      let response = await axiosInstance.get('/check/login-status', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      console.log(response.data, " ----")
+    }
+
+  const handleAdminClick = async (e) => {
+    e.preventDefault();
+
+    if (!isLoggedIn) {
+      toast.error("Please login first");
+      navigate("/user/login");
+      return;
+    }
+
+    const adminCheck = await checkAdminStatus();
+    if (adminCheck) {
+      navigate("/admin");
+    } else {
+      toast.error("Access denied. Admin privileges required.");
+      navigate("/");
+    }
+  };
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        if (!token) {
-          setIsLoggedIn(false);
-          setUserRole("");
-          return;
-        }
-
-        const response = await axiosInstance.get("/user/home");
-        setIsLoggedIn(response.status === 200);
-        if (response.data.user) {
-          setUserRole(response.data.user.role);
-        }
-      } catch (error) {
-        setIsLoggedIn(false);
-        setUserRole("");
-      }
-    };
-
     checkLoginStatus();
   }, [token]); // Runs when `token` changes
 
@@ -53,12 +86,12 @@ const Navbar = () => {
       setToken(null);
       localStorage.removeItem("token");
       setIsLoggedIn(false);
+      fetchCart()
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
-
 
   return (
     <div className="flex items-center justify-between py-2 font-medium sticky top-0 backdrop-blur-lg bg-[#f9f9f9] shadow-lg w-full px-10">
@@ -81,6 +114,10 @@ const Navbar = () => {
         </NavLink>
         <NavLink to="/contact" className="flex flex-col items-center gap-1 px-3 py-2  rounded-lg hover:text-gray-700 hover:rounded-lg hover:bg-gray-100 transition duration-400">
           <p>Contact</p>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+        </NavLink>
+        <NavLink to="/admin" className="flex flex-col items-center justify-center gap-1 px-3 py-1  rounded-4xl hover:text-gray-700 hover:rounded-4xl hover:bg-gray-100 transition duration-400 border-2">
+          <p>Admin</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
       </ul>
@@ -138,7 +175,7 @@ const Navbar = () => {
 
           {/* Sidebar */}
           <div
-            className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? "w-full" : "w-0"
+            className={`absolute top-0 right-0 bottom-0 z-40 overflow-hidden bg-white transition-all ${visible ? "w-full" : "w-0"
               }`}
           >
             <div className="flex flex-col text-gray-600">
@@ -157,6 +194,9 @@ const Navbar = () => {
               </NavLink>
               <NavLink className="py-2 pl-6 border border-gray-200" onClick={() => setVisible(false)} to="/contact">
                 Contact
+              </NavLink>
+              <NavLink className="py-2 pl-6 border border-gray-200" onClick={() => setVisible(false)} to="/contact">
+                Admin
               </NavLink>
             </div>
           </div>

@@ -10,6 +10,7 @@ import categoriesController from './controllers/categories.controller.js'
 import productController from './controllers/product.controller.js';
 import syncDatabase from './sync.js';
 import adminAuth from './middlewares/adminAuth.js';
+import loginCheckRoutes from './routes/check.routes.js'
 syncDatabase()
 // import syncDatabase from './sync.js'
 
@@ -36,6 +37,7 @@ app.use(cookieParser())
 app.use('/user', userRoutes)
 app.use('/admin', adminAuth('admin'), adminRoutes)
 app.use('/cart', cartRoutes)
+app.use('/check', loginCheckRoutes)
 
 app.get('/categories', categoriesController)
 app.get('/products', productController)

@@ -36,15 +36,9 @@ const userModel = sequelize.define("User", {
     defaultValue: DataTypes.NOW
   },
 },
-  { timestamps: false },
-  {
-    indexes: [
-      {
-        unique: true,
-        fields: ["email"],
-      },
-    ],
-  }
+    {
+      timestamps: false,
+    }
 );
 
 export default userModel;
