@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { Home, List, Package, ShoppingCart, Users } from "lucide-react";
 
 const AdminPanel = () => {
+
+
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}

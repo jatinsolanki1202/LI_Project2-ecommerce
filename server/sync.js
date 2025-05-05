@@ -15,7 +15,7 @@ const OrderModel = new Order(sequelize);
 
 const syncDatabase = async () => {
   try {
-    await sequelize.sync({ force: false, alter: true }); // `force: true` drops all tables and creates new ones
+    await sequelize.sync({ force: false, alter: false }); // `force: true` drops all tables and creates new ones
     await sequelize.authenticate();
     console.log('Database connected successfully');
 
