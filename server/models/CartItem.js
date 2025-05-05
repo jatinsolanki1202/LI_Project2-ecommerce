@@ -22,3 +22,4 @@ const CartItem = sequelize.define('CartItem', {
     }
   }, { tableName: "cart_items", timestamps: false });
   
+  export default CartItem;

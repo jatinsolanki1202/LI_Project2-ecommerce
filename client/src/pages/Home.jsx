@@ -41,7 +41,11 @@ const Home = () => {
         headers: { token },
       });
 
-      const cartItems = cartResponse.data.cart || [];
+      console.log(cartResponse.data,"cccacaaaa");
+      
+
+      const cart = cartResponse.data.cart;
+      const cartItems = cartResponse.data.data?.cartItems || [];
       const cartItem = cartItems.find((item) => item.product_id === product.id);
       const currentCartQuantity = cartItem ? cartItem.quantity : 0;
 
@@ -53,7 +57,7 @@ const Home = () => {
 
       const response = await axiosInstance.post(
           "/user/cart/add",
-          { product_id: product.id, quantity },
+          { product_id: product.id, quantity,cart_id: cart.id },
           { headers: { token } }
       );
 
