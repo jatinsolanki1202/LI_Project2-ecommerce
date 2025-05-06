@@ -8,7 +8,7 @@ import profileIcon from '../assets/images/profile_icon.png';
 import cartIcon from '../assets/images/cart_icon.png';
 import menuIcon from '../assets/images/menu_icon.png';
 import dropdownIcon from '../assets/images/dropdown_icon.png';
-import { CartContext,  } from "../context/CartContext.jsx";
+import { CartContext } from "../context/CartContext.jsx";
 import SearchBar from "./SearchBar.jsx";
 
 const Navbar = () => {
@@ -20,43 +20,48 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false)
   const navigate = useNavigate();
-    const checkLogin = async () => {
-      try {
-        fetchToken()
-        if (!token) {
-          setIsLoggedIn(false);
-          setUserRole("");
-          return;
-        }
-
-        const response = await axiosInstance.get("/user/home");
-        setIsLoggedIn(response.status === 200);
-        if (response.data.user) {
-          setUserRole(response.data.user?.role);
-        }
-        console.log(response.data, " ----")
-        if(response.data.user?.role == "admin") {
-          setIsAdmin(true)
-        }
-      } catch (error) {
+  const checkLogin = async () => {
+    try {
+      fetchToken()
+      if (!token) {
         setIsLoggedIn(false);
         setUserRole("");
-        console.log("login error => ", error.message)
+        return;
       }
-    };
 
-    const checkLoginStatus = async () => {
+      const response = await axiosInstance.get("/user/home");
+      setIsLoggedIn(response.status === 200);
+      if (response.data.user) {
+        setUserRole(response.data.user?.role);
+      }
+      console.log(response.data, " ----")
+      if (response.data.user?.role == "admin") {
+        setIsAdmin(true)
+      }
+    } catch (error) {
+      setIsLoggedIn(false);
+      setUserRole("");
+      console.log("login error => ", error.message)
+    }
+  };
+
+  const checkLoginStatus = async () => {
+    try {
       let response = await axiosInstance.get('/check/login-status', {
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
-      if(response.data.role == "admin") {
+
+      if (response.data?.role == "admin" && response.data.success) {
         navigate("/admin")
       } else {
         navigate("/admin/login")
       }
+    } catch (err) {
+      console.log("admin login error: ", err.message)
     }
+  }
 
   const handleAdminClick = async (e) => {
     e.preventDefault();
@@ -129,14 +134,14 @@ const Navbar = () => {
       <ul>
         <div className="flex items-center gap-6">
           <img
-              src={searchIcon}
-              className="w-5 cursor-pointer"
-              alt="Search"
-              onClick={() => setIsSearchOpen(true)}
+            src={searchIcon}
+            className="w-5 cursor-pointer"
+            alt="Search"
+            onClick={() => setIsSearchOpen(true)}
           />
           <SearchBar
-              isOpen={isSearchOpen}
-              onClose={() => setIsSearchOpen(false)}
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
           />
           {/* Profile Dropdown */}
           <div className="group relative">
