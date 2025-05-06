@@ -24,7 +24,7 @@ const AdminLogin = () => {
         toast.error(response.data.message);
       }
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.message)
     }
   };
 
