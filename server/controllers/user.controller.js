@@ -85,7 +85,7 @@ const homePage = async (req, res) => {
     });
 
     console.log(products);
-    
+
 
     res.json({
       message: "fetched all products",
@@ -112,15 +112,12 @@ const logoutUser = (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
-    console.log(req.body,"bodyyyy");
-    
+    console.log(req.body, "bodyyyy");
+
     let userId = req.user.id;
     if (!userId) return res.json({ success: false, message: "login to add product to cart" })
-    let { product_id, quantity,cart_id } = req.body;
+    let { product_id, quantity, cart_id } = req.body;
 
-    console.log(product_id,"pidddd");
-    console.log(quantity,"qqqqqq");
-    
 
     let product = await Product.findOne({
       where: { id: product_id }
@@ -190,7 +187,7 @@ const listCart = async (req, res) => {
         include: [
           {
             model: Product,
-            include: [ ProductImage ],
+            include: [ProductImage],
           }
         ]
       }

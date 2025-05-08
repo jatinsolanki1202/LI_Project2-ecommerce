@@ -4,11 +4,13 @@ import CartItem from "../models/CartItem.js"
 const removeItem = async (req, res) => {
   try {
     let userId = req.user.id
+    let cartId = req.query.cartid
+
 
     let productId = req.params.productId
     let cartItem = await CartItem.findOne({
       where: {
-        cart_id: req.user.id,
+        cart_id: cartId,
         product_id: productId
       }
     })
