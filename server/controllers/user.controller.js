@@ -8,6 +8,7 @@ import ProductImage from "../models/ProductImage.js";
 import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import OrderItem from "../models/OrderItem.js";
+import CartItem from "../models/CartItem.js";
 import { where } from "sequelize";
 
 const createUser = async (req, res) => {
@@ -83,6 +84,9 @@ const homePage = async (req, res) => {
       include: [{ model: ProductImage }]
     });
 
+    console.log(products);
+    
+
     res.json({
       message: "fetched all products",
       // role: localStorage.getItem("token"), // Include user details
@@ -108,9 +112,15 @@ const logoutUser = (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
+    console.log(req.body,"bodyyyy");
+    
     let userId = req.user.id;
     if (!userId) return res.json({ success: false, message: "login to add product to cart" })
-    let { product_id, quantity } = req.body;
+    let { product_id, quantity,cart_id } = req.body;
+
+    console.log(product_id,"pidddd");
+    console.log(quantity,"qqqqqq");
+    
 
     let product = await Product.findOne({
       where: { id: product_id }
@@ -118,8 +128,8 @@ const addToCart = async (req, res) => {
 
     if (product.stock < 1) return res.json({ success: false, message: "Not enough stock to add", status: 400 })
 
-    let existingCartItem = await Cart.findOne({
-      where: { user_id: userId, product_id: product_id }
+    let existingCartItem = await CartItem.findOne({
+      where: { cart_id: cart_id, product_id: product_id }
     });
 
     if (existingCartItem) {
@@ -132,8 +142,9 @@ const addToCart = async (req, res) => {
         data: existingCartItem
       });
     } else {
-      let newCartItem = await Cart.create({
-        user_id: userId,
+      let newCartItem = await CartItem.create({
+        // user_id: userId,
+        cart_id: cart_id,
         product_id: product_id,
         quantity: quantity || 1
       });
@@ -157,19 +168,34 @@ const addToCart = async (req, res) => {
 const listCart = async (req, res) => {
   let userId = req.user.id
 
-  let cart = await Cart.findAll({
+  // let cart = await Cart.findOne({
+  //   where: { user_id: userId },
+  //   include: [
+  //     {
+  //       model: Product,
+  //       include: [
+  //         {
+  //           model: ProductImage, // Assuming Product has images
+  //         }
+  //       ]
+  //     }
+  //   ],
+  // })
+
+  const cart = await Cart.findOne({
     where: { user_id: userId },
     include: [
       {
-        model: Product,
+        model: CartItem,
         include: [
           {
-            model: ProductImage, // Assuming Product has images
+            model: Product,
+            include: [ ProductImage ],
           }
         ]
       }
-    ],
-  })
+    ]
+  });
 
   if (cart) return res.json({ cart, success: true, message: "fetched cart details" })
 }

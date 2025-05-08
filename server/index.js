@@ -11,6 +11,7 @@ import productController from './controllers/product.controller.js';
 import syncDatabase from './sync.js';
 import adminAuth from './middlewares/adminAuth.js';
 import loginCheckRoutes from './routes/check.routes.js'
+import loginAuth from './middlewares/loginAuth.js';
 syncDatabase()
 // import syncDatabase from './sync.js'
 

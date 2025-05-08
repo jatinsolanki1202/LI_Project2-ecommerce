@@ -20,11 +20,18 @@ const removeItem = async (req, res) => {
 }
 
 const fetchCartItems = async(req, res) => {
+  
 try {
   const userId = req.user.id;
-  const cart = await Cart.findAll({where: {user_id: userId}})
+  console.log(userId,"-----------");
+  
+  let cart = await Cart.findOne({where: {user_id: userId}})
 
-  if (!cart) return res.json({success: false, message: 'Cart is empty'})
+  console.log(cart,"ppppp");
+
+  if (!cart) {
+    cart = await Cart.create({ user_id: userId });
+  }
 
   return res.json({success: true, message: "cart found", data: cart})
 } catch (err) {

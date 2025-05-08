@@ -46,6 +46,7 @@ const AdminProductPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataObj = new FormData();
+    
 
     formDataObj.append("name", formData.name);
     formDataObj.append("description", formData.description);

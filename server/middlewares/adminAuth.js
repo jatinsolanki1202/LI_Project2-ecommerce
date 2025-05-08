@@ -1,4 +1,6 @@
 const adminAuth = (...role) => {
+  console.log("req here");
+  
   return (req, res, next) => {
     try {
       if (!role.includes(req.user.role)) {

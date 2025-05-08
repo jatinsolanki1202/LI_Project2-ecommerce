@@ -21,8 +21,8 @@ const ProductImage = sequelize.define('Product_Images', {
 }, { timestamps: false });
 
 
-Product.hasMany(ProductImage, { foreignKey: 'product_id', onDelete: 'CASCADE' })
-categoryModel.hasMany(ProductImage, { foreignKey: 'product_id', onDelete: 'CASCADE' })
-ProductImage.belongsTo(Product, { foreignKey: 'product_id', onDelete: 'CASCADE' });
+// Product.hasMany(ProductImage, { foreignKey: 'product_id', onDelete: 'CASCADE' })
+// categoryModel.hasMany(ProductImage, { foreignKey: 'product_id', onDelete: 'CASCADE' })
+// ProductImage.belongsTo(Product, { foreignKey: 'product_id', onDelete: 'CASCADE' });
 
 export default ProductImage;

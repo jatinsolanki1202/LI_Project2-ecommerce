@@ -13,7 +13,6 @@ const Order = sequelize.define(
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: { model: "Users", key: "id" }, // Ensures foreign key constraint
     },
     total_amount: {
       type: DataTypes.DECIMAL(10, 2),

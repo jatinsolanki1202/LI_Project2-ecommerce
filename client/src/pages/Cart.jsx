@@ -26,7 +26,8 @@ const Cart = () => {
       const response = await axiosInstance.get("/user/cart", {
         headers: { token },
       });
-      const cartData = response.data.cart || [];
+      
+      const cartData = response.data.data?.CartItems || [];
       setCartItems(cartData);
       calculateTotal(cartData);
     } catch (error) {
