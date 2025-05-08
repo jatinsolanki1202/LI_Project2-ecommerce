@@ -7,7 +7,7 @@ import { CartContext } from "../context/CartContext";
 
 const Cart = () => {
   const { token, fetchToken } = useContext(storeContext);
-  const { fetchCart } = useContext(CartContext)
+  const { fetchCart, cart } = useContext(CartContext)
   const [cartItems, setCartItems] = useState([]);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
@@ -26,8 +26,8 @@ const Cart = () => {
       const response = await axiosInstance.get("/user/cart", {
         headers: { token },
       });
-      
-      const cartData = response.data.data?.CartItems || [];
+
+      const cartData = response.data.cart?.CartItems || [];
       setCartItems(cartData);
       calculateTotal(cartData);
     } catch (error) {
@@ -65,7 +65,8 @@ const Cart = () => {
 
   const removeFromCart = async () => {
     try {
-      const response = await axiosInstance.delete(`/cart/remove/${selectedProductId}`, {
+
+      const response = await axiosInstance.delete(`/cart/remove/${selectedProductId}?cartid=${cart.id}`, {
         headers: { token },
       });
 

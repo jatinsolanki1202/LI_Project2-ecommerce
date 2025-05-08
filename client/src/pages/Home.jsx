@@ -41,11 +41,9 @@ const Home = () => {
         headers: { token },
       });
 
-      console.log(cartResponse.data,"cccacaaaa");
-      
 
       const cart = cartResponse.data.cart;
-      const cartItems = cartResponse.data.data?.cartItems || [];
+      const cartItems = cartResponse.data.cart?.CartItems || [];
       const cartItem = cartItems.find((item) => item.product_id === product.id);
       const currentCartQuantity = cartItem ? cartItem.quantity : 0;
 
@@ -56,23 +54,23 @@ const Home = () => {
       }
 
       const response = await axiosInstance.post(
-          "/user/cart/add",
-          { product_id: product.id, quantity,cart_id: cart.id },
-          { headers: { token } }
+        "/user/cart/add",
+        { product_id: product.id, quantity, cart_id: cart.id },
+        { headers: { token } }
       );
 
       if (response.data.message == "session timed out. Please login again") {
         localStorage.removeItem("token")
         toast.error(response.data.message)
-    fetchCart()
+        fetchCart()
 
       } else if (response.data.success) {
         toast.success("Added to cart successfully");
-    fetchCart()
+        fetchCart()
 
       } else {
         toast.error(response.data.message);
-    fetchCart()
+        fetchCart()
 
       }
     } catch (err) {

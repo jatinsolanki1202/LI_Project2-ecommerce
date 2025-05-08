@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance.js";
 import { storeContext } from "../context/storeContext.jsx";
 import toast from "react-hot-toast";
-import {CartContext} from "../context/CartContext.jsx";
+import { CartContext } from "../context/CartContext.jsx";
 
 const Products = () => {
   const url = "http://127.0.0.1:8000";
@@ -27,14 +27,14 @@ const Products = () => {
   };
 
   const fetchCategories = async () => {
-    
+
     try {
-      const response = await axiosInstance.get("http://localhost:8000/categories", {
+      const response = await axiosInstance.get("/categories", {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      
+
       setCategories(response.data.data);
     } catch (error) {
       console.error("Error fetching categories:", error.response ? error.response.data : error.message);
@@ -82,22 +82,22 @@ const Products = () => {
 
       const response = await axiosInstance.post(
         "/user/cart/add",
-        { product_id: product.id, quantity,cart_id: cart.id },
+        { product_id: product.id, quantity, cart_id: cart.id },
         { headers: { token } }
       );
 
       if (response.data.message == "session timed out. Please login again") {
         localStorage.removeItem("token")
         toast.error(response.data.message)
-    fetchCart()
+        fetchCart()
 
       } else if (response.data.success) {
         toast.success("Added to cart successfully");
-    fetchCart()
+        fetchCart()
 
       } else {
         toast.error(response.data.message);
-    fetchCart()
+        fetchCart()
 
       }
     } catch (err) {

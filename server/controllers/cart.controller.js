@@ -1,13 +1,14 @@
 import Cart from "../models/Cart.js"
+import CartItem from "../models/CartItem.js"
 
 const removeItem = async (req, res) => {
   try {
     let userId = req.user.id
 
     let productId = req.params.productId
-    let cartItem = await Cart.findOne({
+    let cartItem = await CartItem.findOne({
       where: {
-        user_id: req.user.id,
+        cart_id: req.user.id,
         product_id: productId
       }
     })
@@ -19,24 +20,27 @@ const removeItem = async (req, res) => {
   }
 }
 
-const fetchCartItems = async(req, res) => {
-  
-try {
-  const userId = req.user.id;
-  console.log(userId,"-----------");
-  
-  let cart = await Cart.findOne({where: {user_id: userId}})
+const fetchCartItems = async (req, res) => {
 
-  console.log(cart,"ppppp");
+  try {
+    const userId = req.user.id;
 
-  if (!cart) {
-    cart = await Cart.create({ user_id: userId });
+    let cart = await Cart.findOne({
+      where: { user_id: userId },
+      include: [{
+        model: CartItem,
+        // as: 'cartItems' // optional alias, only if you defined one in association
+      }]
+    });
+
+    if (!cart) {
+      cart = await Cart.create({ user_id: userId });
+    }
+
+    return res.json({ data: cart, success: true, message: "cart found" })
+  } catch (err) {
+    console.log(err.message)
+    res.json({ success: false, message: err.message })
   }
-
-  return res.json({success: true, message: "cart found", data: cart})
-} catch (err) {
-  console.log(err.message)
-  res.json({success: false, message: err.message})
 }
-}
-export { removeItem , fetchCartItems}
+export { removeItem, fetchCartItems }

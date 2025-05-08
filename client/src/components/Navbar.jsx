@@ -10,6 +10,7 @@ import menuIcon from '../assets/images/menu_icon.png';
 import dropdownIcon from '../assets/images/dropdown_icon.png';
 import { CartContext } from "../context/CartContext.jsx";
 import SearchBar from "./SearchBar.jsx";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const { token, setToken, fetchToken } = useContext(storeContext);
@@ -20,30 +21,30 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false)
   const navigate = useNavigate();
-  // const checkLogin = async () => {
-  //   try {
-  //     fetchToken()
-  //     if (!token) {
-  //       setIsLoggedIn(false);
-  //       setUserRole("");
-  //       return;
-  //     }
+  const checkLogin = async () => {
+    try {
+      fetchToken()
+      if (!token) {
+        setIsLoggedIn(false);
+        setUserRole("");
+        return;
+      }
 
-  //     const response = await axiosInstance.get("/user/home");
-  //     setIsLoggedIn(response.status === 200);
-  //     if (response.data.user) {
-  //       setUserRole(response.data.user?.role);
-  //     }
-  //     console.log(response.data, " ----")
-  //     if (response.data.user?.role == "admin") {
-  //       setIsAdmin(true)
-  //     }
-  //   } catch (error) {
-  //     setIsLoggedIn(false);
-  //     setUserRole("");
-  //     console.log("login error => ", error.message)
-  //   }
-  // };
+      const response = await axiosInstance.get("/user/home");
+      setIsLoggedIn(response.status === 200);
+      if (response.data.user) {
+        setUserRole(response.data.user?.role);
+      }
+      console.log(response.data, " ----")
+      if (response.data.user?.role == "admin") {
+        setIsAdmin(true)
+      }
+    } catch (error) {
+      setIsLoggedIn(false);
+      setUserRole("");
+      console.log("login error => ", error.message)
+    }
+  };
 
   const checkLoginStatus = async () => {
     try {
@@ -65,10 +66,12 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchCart()
+    checkLogin()
   }, [])
 
   useEffect(() => {
     fetchCart()
+    checkLogin()
   }, [token])
   const handleLogout = async () => {
     try {
@@ -78,6 +81,7 @@ const Navbar = () => {
       setIsLoggedIn(false);
       fetchCart()
       navigate("/");
+      toast.success("Logged out successfully")
     } catch (error) {
       console.error("Logout failed:", error);
     }
