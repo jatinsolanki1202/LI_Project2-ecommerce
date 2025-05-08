@@ -20,30 +20,30 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false)
   const navigate = useNavigate();
-  const checkLogin = async () => {
-    try {
-      fetchToken()
-      if (!token) {
-        setIsLoggedIn(false);
-        setUserRole("");
-        return;
-      }
+  // const checkLogin = async () => {
+  //   try {
+  //     fetchToken()
+  //     if (!token) {
+  //       setIsLoggedIn(false);
+  //       setUserRole("");
+  //       return;
+  //     }
 
-      const response = await axiosInstance.get("/user/home");
-      setIsLoggedIn(response.status === 200);
-      if (response.data.user) {
-        setUserRole(response.data.user?.role);
-      }
-      console.log(response.data, " ----")
-      if (response.data.user?.role == "admin") {
-        setIsAdmin(true)
-      }
-    } catch (error) {
-      setIsLoggedIn(false);
-      setUserRole("");
-      console.log("login error => ", error.message)
-    }
-  };
+  //     const response = await axiosInstance.get("/user/home");
+  //     setIsLoggedIn(response.status === 200);
+  //     if (response.data.user) {
+  //       setUserRole(response.data.user?.role);
+  //     }
+  //     console.log(response.data, " ----")
+  //     if (response.data.user?.role == "admin") {
+  //       setIsAdmin(true)
+  //     }
+  //   } catch (error) {
+  //     setIsLoggedIn(false);
+  //     setUserRole("");
+  //     console.log("login error => ", error.message)
+  //   }
+  // };
 
   const checkLoginStatus = async () => {
     try {
@@ -63,32 +63,13 @@ const Navbar = () => {
     }
   }
 
-  const handleAdminClick = async (e) => {
-    e.preventDefault();
-
-    if (!isLoggedIn) {
-      toast.error("Please login first");
-      navigate("/user/login");
-      return;
-    }
-
-    const adminCheck = await checkAdminStatus();
-    if (adminCheck) {
-      navigate("/admin");
-    } else {
-      toast.error("Access denied. Admin privileges required.");
-      navigate("/");
-    }
-  };
-
-  useEffect(() => {
-    checkLogin();
-  }, [token]); // Runs when `token` changes
-
   useEffect(() => {
     fetchCart()
   }, [])
 
+  useEffect(() => {
+    fetchCart()
+  }, [token])
   const handleLogout = async () => {
     try {
       await axiosInstance.post("/user/logout");
@@ -170,7 +151,7 @@ const Navbar = () => {
           <Link to="/cart" className="relative">
             <img src={cartIcon} className="w-5 min-w-5" alt="Cart" />
             <p className="absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]">
-              {cartLength}
+              {cartLength > 0 ? cartLength : 0}
             </p>
           </Link>
 

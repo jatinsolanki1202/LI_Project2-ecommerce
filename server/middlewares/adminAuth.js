@@ -2,7 +2,7 @@ const adminAuth = (...role) => {
   return (req, res, next) => {
     try {
       if (!role.includes(req.user.role)) {
-        return res.json({ data: null, message: "Unauthorized", status: 403 })
+        return res.json({ success: false, data: null, message: "Unauthorized", status: 403 })
       }
       next()
     } catch (err) {

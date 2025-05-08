@@ -4,9 +4,11 @@ import { X } from "lucide-react";
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { storeContext } from "../context/storeContext";
+import { CartContext } from "../context/CartContext";
 
 const LoginPage = () => {
   const { setToken } = useContext(storeContext);
+  const { fetchCart } = useContext(CartContext)
 
   const [isRegister, setIsRegister] = useState(false);
   const [loginUser, setLoginUser] = useState({ email: "", password: "" });
@@ -34,9 +36,11 @@ const LoginPage = () => {
         toast.success(response.data.message);
         localStorage.setItem('token', response.data.token);
         navigate("/");
+        fetchCart()
       } else {
         toast.error(response.data.message);
         localStorage.removeItem("token");
+        fetchCart()
       }
     } catch (err) {
       toast.error("Something went wrong. Please try again");
@@ -51,6 +55,7 @@ const LoginPage = () => {
         toast.success(response.data.message);
         localStorage.setItem("token", response.data.token);
         navigate("/");
+        fetchCart()
       } else {
         toast.error(response.data.message);
       }
