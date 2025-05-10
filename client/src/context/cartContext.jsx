@@ -15,15 +15,13 @@ const CartContextProvider = ({ children }) => {
     const response = await axiosInstance.get('/cart', { headers: { token } })
 
     setCart(response.data.data)
-    console.log(cart)
-    setCartLength(response.data.data?.length)
+    setCartLength(response.data.data?.CartItems?.length)
 
 
   }
 
   useEffect(() => {
     fetchCart()
-
   }, [])
   const contextValue = { cart, fetchCart, cartLength }
 

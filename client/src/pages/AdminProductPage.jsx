@@ -46,13 +46,12 @@ const AdminProductPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataObj = new FormData();
-    
 
     formDataObj.append("name", formData.name);
     formDataObj.append("description", formData.description);
     formDataObj.append("price", formData.price);
     formDataObj.append("stock", formData.stock);
-    formDataObj.append("category", formData?.category != "" ? formData.category : "laptops");
+    formDataObj.append("category", formData?.category != "" ? formData.category : "earphones");
 
     if (formData.images && formData.images.length > 0) {
       for (let i = 0; i < formData.images.length; i++) {
@@ -103,7 +102,7 @@ const AdminProductPage = () => {
       description: product?.description,
       price: product?.price,
       stock: product?.stock || 0,
-      category: product?.Category.name || "laptops",
+      category: product?.Category.name || "earphones",
       images: null,
     });
   };
@@ -164,6 +163,7 @@ const AdminProductPage = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
+                  <option selected={true} disabled>Select Category</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.name}>{cat.name}</option>
                   ))}

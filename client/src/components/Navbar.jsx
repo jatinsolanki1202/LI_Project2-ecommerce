@@ -8,82 +8,71 @@ import profileIcon from '../assets/images/profile_icon.png';
 import cartIcon from '../assets/images/cart_icon.png';
 import menuIcon from '../assets/images/menu_icon.png';
 import dropdownIcon from '../assets/images/dropdown_icon.png';
-import { CartContext,  } from "../context/CartContext.jsx";
+import { CartContext } from "../context/CartContext.jsx";
 import SearchBar from "./SearchBar.jsx";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const { token, setToken, fetchToken } = useContext(storeContext);
   const { cart, fetchCart, cartLength } = useContext(CartContext)
   const [visible, setVisible] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!token);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [userRole, setUserRole] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false)
   const navigate = useNavigate();
-    const checkLogin = async () => {
-      try {
-        fetchToken()
-        if (!token) {
-          setIsLoggedIn(false);
-          setUserRole("");
-          return;
-        }
-
-        const response = await axiosInstance.get("/user/home");
-        setIsLoggedIn(response.status === 200);
-        if (response.data.user) {
-          setUserRole(response.data.user?.role);
-        }
-        console.log(response.data, " ----")
-        if(response.data.user?.role == "admin") {
-          setIsAdmin(true)
-        }
-      } catch (error) {
+  const checkLogin = async () => {
+    try {
+      fetchToken()
+      if (!token) {
         setIsLoggedIn(false);
         setUserRole("");
-        console.log("login error => ", error.message)
+        return;
       }
-    };
 
-    const checkLoginStatus = async () => {
+      const response = await axiosInstance.get("/user/home");
+      setIsLoggedIn(response.status === 200);
+      if (response.data.user) {
+        setUserRole(response.data.user?.role);
+      }
+      console.log(response.data, " ----")
+      if (response.data.user?.role == "admin") {
+        setIsAdmin(true)
+      }
+    } catch (error) {
+      setIsLoggedIn(false);
+      setUserRole("");
+      console.log("login error => ", error.message)
+    }
+  };
+
+  const checkLoginStatus = async () => {
+    try {
       let response = await axiosInstance.get('/check/login-status', {
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
-      if(response.data.role == "admin") {
+
+      if (response.data?.role == "admin" && response.data.success) {
         navigate("/admin")
       } else {
         navigate("/admin/login")
       }
+    } catch (err) {
+      console.log("admin login error: ", err.message)
     }
-
-  const handleAdminClick = async (e) => {
-    e.preventDefault();
-
-    if (!isLoggedIn) {
-      toast.error("Please login first");
-      navigate("/user/login");
-      return;
-    }
-
-    const adminCheck = await checkAdminStatus();
-    if (adminCheck) {
-      navigate("/admin");
-    } else {
-      toast.error("Access denied. Admin privileges required.");
-      navigate("/");
-    }
-  };
+  }
 
   useEffect(() => {
-    checkLogin();
-  }, [token]); // Runs when `token` changes
+    // fetchCart()
+    checkLogin()
+  }, [])
 
   useEffect(() => {
     fetchCart()
-  }, [])
-
+    checkLogin()
+  }, [token])
   const handleLogout = async () => {
     try {
       await axiosInstance.post("/user/logout");
@@ -92,6 +81,7 @@ const Navbar = () => {
       setIsLoggedIn(false);
       fetchCart()
       navigate("/");
+      toast.success("Logged out successfully")
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -129,14 +119,14 @@ const Navbar = () => {
       <ul>
         <div className="flex items-center gap-6">
           <img
-              src={searchIcon}
-              className="w-5 cursor-pointer"
-              alt="Search"
-              onClick={() => setIsSearchOpen(true)}
+            src={searchIcon}
+            className="w-5 cursor-pointer"
+            alt="Search"
+            onClick={() => setIsSearchOpen(true)}
           />
           <SearchBar
-              isOpen={isSearchOpen}
-              onClose={() => setIsSearchOpen(false)}
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
           />
           {/* Profile Dropdown */}
           <div className="group relative">
@@ -165,7 +155,7 @@ const Navbar = () => {
           <Link to="/cart" className="relative">
             <img src={cartIcon} className="w-5 min-w-5" alt="Cart" />
             <p className="absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]">
-              {cartLength}
+              {cartLength > 0 ? cartLength : 0}
             </p>
           </Link>
 

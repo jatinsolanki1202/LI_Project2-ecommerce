@@ -84,9 +84,6 @@ const homePage = async (req, res) => {
       include: [{ model: ProductImage }]
     });
 
-    console.log(products);
-    
-
     res.json({
       message: "fetched all products",
       // role: localStorage.getItem("token"), // Include user details
@@ -112,15 +109,10 @@ const logoutUser = (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
-    console.log(req.body,"bodyyyy");
-    
     let userId = req.user.id;
     if (!userId) return res.json({ success: false, message: "login to add product to cart" })
-    let { product_id, quantity,cart_id } = req.body;
+    let { product_id, quantity, cart_id } = req.body;
 
-    console.log(product_id,"pidddd");
-    console.log(quantity,"qqqqqq");
-    
 
     let product = await Product.findOne({
       where: { id: product_id }
@@ -190,7 +182,7 @@ const listCart = async (req, res) => {
         include: [
           {
             model: Product,
-            include: [ ProductImage ],
+            include: [ProductImage],
           }
         ]
       }
@@ -204,19 +196,24 @@ const handleCheckOut = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const cartItems = await Cart.findAll({
+    const cart = await Cart.findOne({
       where: { user_id: userId },
-      include: [{ model: Product }],
+      include: [{
+        model: CartItem,
+        include: [{ model: Product }]
+      }],
     });
 
-    if (!cartItems.length) {
+    console.log(JSON.stringify(cart, null, 2), " checkoutApi");
+
+    if (cart.CartItems.length < 1) {
       return res.json({ success: false, message: "Cart is empty", status: 400 });
     }
 
     let totalAmount = 0;
 
     // total amount calculation
-    cartItems.forEach((item) => {
+    cart?.CartItems.forEach((item) => {
       totalAmount += item.quantity * item.Product.price;
     });
 
@@ -226,7 +223,7 @@ const handleCheckOut = async (req, res) => {
       status: "Pending",
     });
 
-    const orderItems = cartItems.map((item) => ({
+    const orderItems = cart.CartItems.map((item) => ({
       order_id: order.id,
       product_id: item.product_id,
       product_name: item.Product.name,

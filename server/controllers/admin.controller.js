@@ -42,32 +42,25 @@ const handleAdminLogin = async (req, res) => {
   }
 }
 const addProduct = async (req, res) => {
-  
+
   try {
     let { name, price, description, stock, category } = req.body;
 
-    console.log(description);
-    console.log(category,"----");
-    
     let images = req.files
     // Validation check
     const errors = validationResult(req);
-    
+
     if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     const categoryRecord = await Category.findOne({ where: { name: category } });
-    console.log(categoryRecord);
-    
 
     if (!categoryRecord) {
       return res.status(404).json({ message: "Category not found!" });
     }
 
     const categoryId = categoryRecord.id;
-    console.log(categoryId);
-    
 
     let product = await Product.create({
       name,

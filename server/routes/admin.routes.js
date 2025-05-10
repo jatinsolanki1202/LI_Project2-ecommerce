@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
-router.post('/add-product', [
+router.post('/add-product', loginAuth, adminAuth("admin"), [
   // check("name").notEmpty().withMessage("Product name is required"),
   // check("price").notEmpty().withMessage("Product price is required"),
   // check("stock").notEmpty().withMessage("stock is required"),

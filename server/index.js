@@ -7,11 +7,12 @@ import cookieParser from 'cookie-parser';
 import adminRoutes from './routes/admin.routes.js'
 import cartRoutes from './routes/cart.routes.js';
 import categoriesController from './controllers/categories.controller.js'
-import productController from './controllers/product.controller.js';
 import syncDatabase from './sync.js';
 import adminAuth from './middlewares/adminAuth.js';
 import loginCheckRoutes from './routes/check.routes.js'
 import loginAuth from './middlewares/loginAuth.js';
+import { getAllProducts, getSingleProduct } from "./controllers/product.controller.js"
+
 syncDatabase()
 // import syncDatabase from './sync.js'
 
@@ -36,12 +37,13 @@ app.use(cors({
 }))
 app.use(cookieParser())
 app.use('/user', userRoutes)
-app.use('/admin', loginAuth, adminAuth('admin'), adminRoutes)
+app.use('/admin', adminRoutes)
 app.use('/cart', cartRoutes)
 app.use('/check', loginCheckRoutes)
 
 app.get('/categories', categoriesController)
-app.get('/products', productController)
+app.get('/products', getAllProducts)
+app.get('/products/:productId', getSingleProduct)
 app.use('/images', express.static('uploads'))
 
 app.get('/', (req, res) => res.send('working'))

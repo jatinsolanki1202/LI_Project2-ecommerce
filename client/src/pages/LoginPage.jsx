@@ -4,9 +4,11 @@ import { X } from "lucide-react";
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { storeContext } from "../context/storeContext";
+import { CartContext } from "../context/CartContext";
 
 const LoginPage = () => {
   const { setToken } = useContext(storeContext);
+  const { fetchCart } = useContext(CartContext)
 
   const [isRegister, setIsRegister] = useState(false);
   const [loginUser, setLoginUser] = useState({ email: "", password: "" });
@@ -34,9 +36,11 @@ const LoginPage = () => {
         toast.success(response.data.message);
         localStorage.setItem('token', response.data.token);
         navigate("/");
+        fetchCart()
       } else {
         toast.error(response.data.message);
         localStorage.removeItem("token");
+        fetchCart()
       }
     } catch (err) {
       toast.error("Something went wrong. Please try again");
@@ -51,6 +55,7 @@ const LoginPage = () => {
         toast.success(response.data.message);
         localStorage.setItem("token", response.data.token);
         navigate("/");
+        fetchCart()
       } else {
         toast.error(response.data.message);
       }
@@ -75,8 +80,8 @@ const LoginPage = () => {
             <input type="text" placeholder="Full Name" className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" name="name" required onChange={handleInputChange} />
           )}
 
-          <input type="email" placeholder="Email" className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" name="email" required onChange={handleInputChange} />
-          <input type="password" placeholder="Password" className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" name="password" required onChange={handleInputChange} />
+          <input type="email" placeholder="Email" className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" name="email" autoComplete="email" required onChange={handleInputChange} />
+          <input type="password" placeholder="Password" className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" name="password" autoComplete="current-password" required onChange={handleInputChange} />
 
           {isRegister && (
             <>

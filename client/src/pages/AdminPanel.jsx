@@ -1,10 +1,35 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Home, List, Package, ShoppingCart, Users } from "lucide-react";
-
+import axiosInstance from "../utils/axiosInstance";
+import toast from "react-hot-toast";
 const AdminPanel = () => {
+  const navigate = useNavigate()
 
+  const checkUserRole = async () => {
+    try {
+      let token = localStorage.getItem("token")
+      if (!token) navigate("admin/login")
 
+      let response = await axiosInstance.get("/check/login-status", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      if (response.data.role == "admin") {
+        navigate("/admin")
+      } else {
+        navigate("/admin/login")
+      }
+    } catch (err) {
+      toast.error("something went wrong")
+    }
+  }
+
+  useEffect(() => {
+    checkUserRole()
+  }, [])
 
   return (
     <div className="flex h-screen bg-gray-100">
