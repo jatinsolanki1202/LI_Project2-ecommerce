@@ -13,6 +13,7 @@ import AdminPanel from './pages/AdminPanel.jsx'
 import AdminProductPage from './pages/AdminProductPage.jsx'
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
+import ProductDetails from './pages/ProductDetails.jsx'
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
           <Route path='/admin/products' element={<AdminProductPage />} />
           <Route path='/about' element={<About />} />
           <Route path='/contact' element={<Contact />} />
+          <Route path='/product/:id' element={<ProductDetails />} />
         </Routes>
       </div>
     </>

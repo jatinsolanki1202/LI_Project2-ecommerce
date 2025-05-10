@@ -16,7 +16,7 @@ const Navbar = () => {
   const { token, setToken, fetchToken } = useContext(storeContext);
   const { cart, fetchCart, cartLength } = useContext(CartContext)
   const [visible, setVisible] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!token);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [userRole, setUserRole] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false)
@@ -65,7 +65,7 @@ const Navbar = () => {
   }
 
   useEffect(() => {
-    fetchCart()
+    // fetchCart()
     checkLogin()
   }, [])
 

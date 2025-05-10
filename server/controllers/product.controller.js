@@ -2,7 +2,7 @@ import categoryModel from "../models/Category.js";
 import Product from "../models/Product.js";
 import ProductImage from "../models/ProductImage.js";
 
-const productController = async (req, res) => {
+const getAllProducts = async (req, res) => {
   try {
     const { category_id } = req.query; // Get category_id from query params
 
@@ -27,4 +27,23 @@ const productController = async (req, res) => {
   }
 };
 
-export default productController;
+const getSingleProduct = async (req, res) => {
+  try {
+    const productId = req.params.productId;
+
+    const product = await Product.findOne({
+      where: { id: productId },
+      include: [{
+        model: ProductImage
+      }]
+    })
+
+    if (!product) return res.status(404).json({ success: false, data: null, message: "No product found" })
+
+    return res.status(200).json({ success: true, data: product, message: "Product fetched" })
+  } catch (error) {
+    console.log("error getting product details: ", error.message)
+  }
+}
+
+export { getAllProducts, getSingleProduct }

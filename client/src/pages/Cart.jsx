@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import { CartContext } from "../context/CartContext";
 
 const Cart = () => {
-  const { token, fetchToken } = useContext(storeContext);
+  const { token, fetchToken, deleteToken } = useContext(storeContext);
   const { fetchCart, cart } = useContext(CartContext)
   const [cartItems, setCartItems] = useState([]);
   const [totalQuantity, setTotalQuantity] = useState(0);
@@ -96,7 +96,13 @@ const Cart = () => {
       const response = await axiosInstance.post("/user/checkout", {}, {
         headers: { token }
       });
-      if (response.data.success) {
+      if (response.data.message == "session timed out. Please login again") {
+        localStorage.removeItem("token");
+        deleteToken();
+        fetchCart();
+        toast.error(response.data.message);
+        return;
+      } else if (response.data.success) {
         toast.success("Order placed successfully!");
         fetchCartItems();
         fetchCart()

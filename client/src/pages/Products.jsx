@@ -9,12 +9,9 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const { token, fetchToken } = useContext(storeContext)
+  const { token, fetchToken, deleteToken } = useContext(storeContext)
   const { fetchCart, cart } = useContext(CartContext)
 
-  useEffect(() => {
-    fetchCart()
-  }, []);
   const fetchProducts = async () => {
     try {
       const response = await axiosInstance.get(`/user/home`);
@@ -59,18 +56,26 @@ const Products = () => {
 
   const addToCart = async (product, quantity) => {
     try {
-      if (!token) {
+      if (!localStorage.getItem("token")) {
         toast.error("Please log in to add items to your cart.");
         return;
       }
 
       // Fetch user's cart to check the current quantity of the product
       const cartResponse = await axiosInstance.get("/user/cart", {
-        headers: { token },
+        headers: { token: localStorage.getItem("token") },
       });
 
+      if (cartResponse.data.message == "session timed out. Please login again") {
+        localStorage.removeItem("token")
+        deleteToken()
+        fetchCart()
+        toast.error(cartResponse.data.message)
+        return;
+      };
+
       const cart = cartResponse.data.cart;
-      const cartItems = cartResponse.data.data?.cartItems || [];
+      const cartItems = cartResponse.data.cart?.CartItems || [];
       const cartItem = cartItems.find((item) => item.product_id === product.id);
       const currentCartQuantity = cartItem ? cartItem.quantity : 0;
 
@@ -83,7 +88,7 @@ const Products = () => {
       const response = await axiosInstance.post(
         "/user/cart/add",
         { product_id: product.id, quantity, cart_id: cart.id },
-        { headers: { token } }
+        { headers: { token: localStorage.getItem("token") } }
       );
 
       if (response.data.message == "session timed out. Please login again") {

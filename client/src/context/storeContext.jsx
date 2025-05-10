@@ -15,11 +15,18 @@ const ContextProvider = ({ children }) => {
     }
   }
 
+  const deleteToken = () => {
+    setToken("")
+  }
   useEffect(() => {
     fetchToken()
   }, [])
 
-  const contextValue = { token, setToken, url, fetchToken }
+  useEffect(() => {
+    fetchToken()
+  }, [token])
+
+  const contextValue = { token, setToken, url, fetchToken, deleteToken }
   return (
     <storeContext.Provider value={contextValue}>
       {children}

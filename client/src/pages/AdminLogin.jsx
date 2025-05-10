@@ -43,6 +43,7 @@ const AdminLogin = () => {
           <input
             type="email"
             name="email"
+            autoComplete="email"
             value={formData.email}
             onChange={handleChange}
             placeholder="Admin Email"
@@ -52,6 +53,7 @@ const AdminLogin = () => {
           <input
             type="password"
             name="password"
+            autoComplete="current-password"
             value={formData.password}
             onChange={handleChange}
             placeholder="Password"

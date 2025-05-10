@@ -2,8 +2,6 @@ import categoryModel from "../models/Category.js"; // Assuming Category is your 
 
 // Controller to fetch categories
 const categoriesController = async (req, res) => {
-  console.log("req come here");
-  
   try {
     const categories = await categoryModel.findAll(); // Fetch all categories
     res.json({ success: true, data: categories });
