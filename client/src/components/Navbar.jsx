@@ -88,7 +88,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex items-center justify-between py-2 font-medium sticky top-0 backdrop-blur-lg bg-[#f9f9f9] shadow-lg w-full px-10">
+    <div className="flex items-center justify-between py-2 font-medium sticky top-0 backdrop-blur-lg bg-[#f9f9f9] shadow-lg w-full px-10 z-[10]">
       <NavLink to="/">
         <img src={logo} className="w-28" alt="Logo" />
       </NavLink>

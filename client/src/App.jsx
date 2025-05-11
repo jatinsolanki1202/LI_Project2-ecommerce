@@ -14,6 +14,7 @@ import AdminProductPage from './pages/AdminProductPage.jsx'
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import ProductDetails from './pages/ProductDetails.jsx'
+import Footer from './components/Footer.jsx'
 
 function App() {
 
@@ -36,6 +37,7 @@ function App() {
           <Route path='/product/:id' element={<ProductDetails />} />
         </Routes>
       </div>
+      {location.pathname !== '/user/logins' && <Footer />}
     </>
   )
 }

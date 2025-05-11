@@ -81,6 +81,7 @@ const homePage = async (req, res) => {
     // console.log(token, "asdfds");
 
     let products = await Product.findAll({
+      where: { is_active: '1' },
       include: [{ model: ProductImage }]
     });
 

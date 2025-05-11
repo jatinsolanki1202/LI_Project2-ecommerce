@@ -6,7 +6,7 @@ const getAllProducts = async (req, res) => {
   try {
     const { category_id } = req.query; // Get category_id from query params
 
-    let whereCondition = {};
+    let whereCondition = { is_active: '1' }; // Default condition to fetch active products
     if (category_id) {
       whereCondition.category_id = parseInt(category_id); // Apply filter if category_id is provided
     }
@@ -32,7 +32,7 @@ const getSingleProduct = async (req, res) => {
     const productId = req.params.productId;
 
     const product = await Product.findOne({
-      where: { id: productId },
+      where: { id: productId, is_active: 1 },
       include: [{
         model: ProductImage
       }]
