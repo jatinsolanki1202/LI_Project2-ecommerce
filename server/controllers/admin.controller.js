@@ -85,9 +85,10 @@ const deleteProduct = async (req, res) => {
   try {
     const productId = req.params.productId
 
-    await Product.destroy({
-      where: { id: productId }
-    })
+    await Product.update(
+      { is_active: '0' },
+      { where: { id: productId } }
+    )
 
     res.json({ success: true, message: "product deleted successfully", status: 200 })
   } catch (err) {
@@ -153,10 +154,13 @@ const editProduct = async (req, res) => {
 };
 
 const fetchCategory = async (req, res) => {
-  let categories = await Category.findAll({})
-  res.json({ data: categories, message: "categories fetched", status: 200 })
+  try {
+    let categories = await Category.findAll({})
+    res.json({ success: true, data: categories, message: "categories fetched", status: 200 })
 
-
+  } catch (error) {
+    console.log("error fetching categories: ", error.message)
+  }
 }
 
 export {

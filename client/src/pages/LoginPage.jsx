@@ -65,7 +65,7 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-[#f9f9f9]">
       <div className="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200">
         <button onClick={() => navigate("/")} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
           <X size={24} />

@@ -31,6 +31,15 @@ const Product = sequelize.define('Product', {
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
+  },
+  updated_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  is_active: {
+    type: DataTypes.ENUM('0', '1'),
+    allowNull: false,
+    defaultValue: '1'
   }
 }, { timestamps: false });
 

@@ -3,8 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { Home, List, Package, ShoppingCart, Users } from "lucide-react";
 import axiosInstance from "../utils/axiosInstance";
 import toast from "react-hot-toast";
+import { storeContext } from "../context/storeContext";
 const AdminPanel = () => {
   const navigate = useNavigate()
+  const { fetchToken, token } = useContext(storeContext)
+  const [categories, setCategories] = useState([])
+  const [products, setProducts] = useState([])
+  const [orders, setorders] = useState([])
 
   const checkUserRole = async () => {
     try {
@@ -27,8 +32,56 @@ const AdminPanel = () => {
     }
   }
 
+  const fetchCategories = async () => {
+    try {
+      const categoryResponse = await axiosInstance.get("/admin/category", {
+        headers: {
+          token: token
+        }
+      })
+      if (categoryResponse.data.success) {
+        setCategories(categoryResponse.data.data)
+      }
+
+    } catch (error) {
+      console.log("error fetching categories:", error.message)
+    }
+  }
+
+  const fetchProducts = async () => {
+    try {
+      const productResponse = await axiosInstance.get("/products", {
+        headers: {
+          token: token
+        }
+      })
+      if (productResponse.data.success) {
+        setProducts(productResponse.data.data)
+      }
+
+    } catch (error) {
+      console.log("error fetching categories:", error.message)
+    }
+  }
+
+  const fetchOrders = async () => {
+    try {
+      const ordersResponse = await axiosInstance.get("/orders", {
+        headers: {
+          token: token
+        }
+      })
+      if (ordersResponse.data.success) {
+        setOrders(ordersResponse.data.data)
+      }
+    } catch (error) {
+      console.log("error fetching categories:", error.message)
+    }
+  }
   useEffect(() => {
     checkUserRole()
+    fetchCategories()
+    fetchProducts()
   }, [])
 
   return (
@@ -64,15 +117,15 @@ const AdminPanel = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <div className="bg-white shadow-lg rounded-lg p-6">
             <h3 className="text-xl font-semibold text-gray-700">Total Categories</h3>
-            <p className="text-2xl font-bold text-blue-600">12</p>
+            <p className="text-2xl font-bold text-blue-600">{categories?.length}</p>
           </div>
           <div className="bg-white shadow-lg rounded-lg p-6">
             <h3 className="text-xl font-semibold text-gray-700">Total Products</h3>
-            <p className="text-2xl font-bold text-green-600">120</p>
+            <p className="text-2xl font-bold text-green-600">{products?.length}</p>
           </div>
           <div className="bg-white shadow-lg rounded-lg p-6">
             <h3 className="text-xl font-semibold text-gray-700">Orders</h3>
-            <p className="text-2xl font-bold text-red-600">25</p>
+            <p className="text-2xl font-bold text-red-600">{orders?.length}</p>
           </div>
         </div>
       </main>

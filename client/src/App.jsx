@@ -14,13 +14,14 @@ import AdminProductPage from './pages/AdminProductPage.jsx'
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import ProductDetails from './pages/ProductDetails.jsx'
+import Footer from './components/Footer.jsx'
 
 function App() {
 
   const location = useLocation();
   return (
     <>
-      {location.pathname !== '/user/logins' && <Navbar />}
+      {location.pathname !== '/user/login' && <Navbar />}
       <div className='min-h-screen px-10 bg-[#f9f9f9]' >
         <Toaster />
         <Routes>
@@ -36,6 +37,7 @@ function App() {
           <Route path='/product/:id' element={<ProductDetails />} />
         </Routes>
       </div>
+      {location.pathname !== '/user/login' && <Footer />}
     </>
   )
 }
