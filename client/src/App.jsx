@@ -21,7 +21,7 @@ function App() {
   const location = useLocation();
   return (
     <>
-      {location.pathname !== '/user/logins' && <Navbar />}
+      {location.pathname !== '/user/login' && <Navbar />}
       <div className='min-h-screen px-10 bg-[#f9f9f9]' >
         <Toaster />
         <Routes>
@@ -37,7 +37,7 @@ function App() {
           <Route path='/product/:id' element={<ProductDetails />} />
         </Routes>
       </div>
-      {location.pathname !== '/user/logins' && <Footer />}
+      {location.pathname !== '/user/login' && <Footer />}
     </>
   )
 }

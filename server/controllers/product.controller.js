@@ -32,7 +32,7 @@ const getSingleProduct = async (req, res) => {
     const productId = req.params.productId;
 
     const product = await Product.findOne({
-      where: { id: productId, is_active: 1 },
+      where: { id: productId, is_active: '1' },
       include: [{
         model: ProductImage
       }]

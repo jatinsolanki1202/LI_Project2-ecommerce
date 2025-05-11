@@ -88,7 +88,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex items-center justify-between py-2 font-medium sticky top-0 backdrop-blur-lg bg-[#f9f9f9] shadow-lg w-full px-10 z-[10]">
+    <div className="flex items-center justify-between py-2 font-medium sticky top-0 backdrop-blur-lg bg-[#f9f9f9] h-auto shadow-lg max-w-screen px-10 z-[10]">
       <NavLink to="/">
         <img src={logo} className="w-28" alt="Logo" />
       </NavLink>
@@ -132,7 +132,7 @@ const Navbar = () => {
           <div className="group relative">
             <img src={profileIcon} className="w-5 cursor-pointer" alt="Profile" />
 
-            <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
+            <div className="group-hover:block hidden absolute dropdown-menu right-0 top-2 pt-4">
               <div className="flex flex-col gap-2 py-3 px-5 w-36 bg-slate-100 text-gray-500 rounded-lg shadow-lg">
                 {isLoggedIn ? (
                   <>
@@ -169,10 +169,10 @@ const Navbar = () => {
 
           {/* Sidebar */}
           <div
-            className={`absolute top-0 right-0 bottom-0 z-40 overflow-hidden bg-white transition-all ${visible ? "w-full" : "w-0"
+            className={`fixed top-0 right-0 bottom-0 z-[99] bg-white transition-all ${visible ? "w-full h-[500px]" : "w-0 hidden"
               }`}
           >
-            <div className="flex flex-col text-gray-600">
+            <div className="flex flex-col bg-white text-gray-600">
               <div onClick={() => setVisible(false)} className="flex items-center gap-4 p-3 cursor-pointer">
                 <img src={dropdownIcon} className="h-4 rotate-180" alt="Back" />
                 <p>Back</p>
@@ -189,7 +189,7 @@ const Navbar = () => {
               <NavLink className="py-2 pl-6 border border-gray-200" onClick={() => setVisible(false)} to="/contact">
                 Contact
               </NavLink>
-              <NavLink className="py-2 pl-6 border border-gray-200" onClick={() => setVisible(false)} to="/contact">
+              <NavLink className="py-2 pl-6 border border-gray-200" onClick={() => setVisible(false)} to="/admin">
                 Admin
               </NavLink>
             </div>

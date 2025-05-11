@@ -146,7 +146,7 @@ const ProductDetails = () => {
                   <div className="flex items-center border rounded-lg overflow-hidden">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 py-1 border-r hover:bg-gray-100"
+                      className="px-3 py-1 border-r hover:bg-gray-100 cursor-pointer"
                     >
                       -
                     </button>
@@ -163,7 +163,7 @@ const ProductDetails = () => {
                     />
                     <button
                       onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                      className="px-3 py-1 border-l hover:bg-gray-100"
+                      className="px-3 py-1 border-l hover:bg-gray-100 cursor-pointer"
                     >
                       +
                     </button>

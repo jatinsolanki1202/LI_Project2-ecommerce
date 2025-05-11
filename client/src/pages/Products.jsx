@@ -8,7 +8,8 @@ const Products = () => {
   const url = "http://127.0.0.1:8000";
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState(new Set());
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { token, fetchToken, deleteToken } = useContext(storeContext)
   const { fetchCart, cart } = useContext(CartContext)
 
@@ -38,20 +39,18 @@ const Products = () => {
     }
   };
 
-  const handleCategoryChange = async (event) => {
-    try {
-      const categoryId = Number(event.target.value);
-      setSelectedCategory(categoryId);
-
-      if (categoryId < 1) {
-        fetchProducts(); // Fetch all products if "All Categories" is selected
-      } else {
-        const response = await axiosInstance.get(`/products?category_id=${categoryId}`);
-        setProducts(response.data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
+  const handleCategoryToggle = (categoryId) => {
+    const newSelected = new Set(selectedCategories);
+    if (newSelected.has(categoryId)) {
+      newSelected.delete(categoryId);
+    } else {
+      newSelected.add(categoryId);
     }
+    setSelectedCategories(newSelected);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   const addToCart = async (product, quantity) => {
@@ -119,51 +118,142 @@ const Products = () => {
     fetchCategories();
   }, []);
 
-  const filteredProducts = selectedCategory
-    ? products.filter((product) => product.category_id === selectedCategory)
-    : products;
+  const filteredProducts = products.filter(product =>
+    selectedCategories.size === 0 || selectedCategories.has(product.category_id)
+  );
 
   return (
-    <div className="p-10 bg-[#f9f9f9] text-black min-h-screen">
-
-      <div className="mb-5">
-        <label className="text-black text-lg font-semibold">Select Category</label>
-        <select
-          value={selectedCategory}
-          onChange={handleCategoryChange}
-          className="w-full p-2 border border-gray-400 bg-[#f9f9f9] text-black rounded"
+    <div className="min-h-screen bg-[#f9f9f9] relative">
+      {/* Mobile Sidebar Toggle Button */}
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden fixed bottom-4 right-4 z-50 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
         >
-          <option value="">All Categories</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-      </div>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
-        {filteredProducts?.map((product) => (
-          <div key={product.id} className="bg-gray-200 text-gray-900 rounded-lg overflow-hidden shadow-lg p-4">
-            <img
-              src={`${url}/images/${product?.Product_Images[0]?.image_path}`}
-              alt={product.name}
-              className="object-contain h-40 w-full rounded-t-lg"
-            />
-            <div className="mt-2">
-              <h3 className="text-lg font-bold truncate">{product.name}</h3>
-              <p className="text-gray-700 text-sm line-clamp-2">{product.description}</p>
-              <p className="text-xl text-green-600 font-semibold">₹{product.price}</p>
-              <p className="text-sm font-medium">Stock: {product.stock}</p>
-            </div>
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        transform transition-transform duration-300 ease-in-out
+        fixed top-0 left-0 h-screen bg-white shadow-lg z-50
+        w-64 overflow-y-auto
+        md:translate-x-0 md:transform-none md:relative md:block
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Categories</h2>
             <button
-              onClick={() => addToCart(product, 1)}
-              className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
+              onClick={() => setIsSidebarOpen(false)}
+              className="md:hidden text-gray-500 hover:text-gray-700"
             >
-              Add to Cart
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
-        ))}
+          <div className="space-y-2">
+            {categories.map((category) => (
+              <label key={category.id} className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedCategories.has(category.id)}
+                  onChange={() => handleCategoryToggle(category.id)}
+                  className="form-checkbox h-4 w-4 text-blue-500 rounded border-gray-300 focus:ring-blue-500"
+                />
+                <span className="text-gray-700 hover:text-blue-500 transition-colors">
+                  {category.name}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="md:ml-64 p-4 md:p-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Products</h1>
+          <p className="text-gray-600">
+            {filteredProducts.length} products found
+            {selectedCategories.size > 0 && ' in selected categories'}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          {filteredProducts.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+            >
+              <div className="relative pb-[75%] md:pb-[100%]">
+                <img
+                  src={`${url}/images/${product?.Product_Images[0]?.image_path}`}
+                  alt={product.name}
+                  className="absolute top-0 left-0 w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-bold text-gray-800 mb-2 truncate">
+                  {product.name}
+                </h3>
+                <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                  {product.description}
+                </p>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xl font-bold text-green-600">
+                    ₹{product.price}
+                  </span>
+                  <span className={`text-sm font-medium px-2 py-1 rounded-full ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => addToCart(product, 1)}
+                  disabled={product.stock === 0}
+                  className={`w-full py-2 px-4 rounded-lg font-semibold transition-colors ${product.stock === 0
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                    }`}
+                >
+                  {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
