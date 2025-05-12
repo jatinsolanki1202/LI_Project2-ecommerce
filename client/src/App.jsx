@@ -15,6 +15,7 @@ import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import ProductDetails from './pages/ProductDetails.jsx'
 import Footer from './components/Footer.jsx'
+import RazorCheckoutPage from './pages/RazorCheckoutPage.jsx'
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
           <Route path='/about' element={<About />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/product/:id' element={<ProductDetails />} />
+          <Route path='/razorpay-checkout-page' element={<RazorCheckoutPage />} />
         </Routes>
       </div>
       {location.pathname !== '/user/login' && <Footer />}

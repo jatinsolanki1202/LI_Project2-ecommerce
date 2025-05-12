@@ -10,6 +10,7 @@ import categoriesController from './controllers/categories.controller.js'
 import syncDatabase from './sync.js';
 import adminAuth from './middlewares/adminAuth.js';
 import loginCheckRoutes from './routes/check.routes.js'
+import razorpayRoutes from './routes/razorpay.routes.js'
 import loginAuth from './middlewares/loginAuth.js';
 import { getAllProducts, getSingleProduct } from "./controllers/product.controller.js"
 
@@ -45,6 +46,7 @@ app.get('/categories', categoriesController)
 app.get('/products', getAllProducts)
 app.get('/products/:productId', getSingleProduct)
 app.use('/images', express.static('uploads'))
+app.use("/razorpay",razorpayRoutes)
 
 app.get('/', (req, res) => res.send('working'))
 

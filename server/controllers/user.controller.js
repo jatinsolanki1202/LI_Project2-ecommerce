@@ -1,15 +1,16 @@
 import { validationResult } from "express-validator";
-import { hashPassword, comparePassword } from '../utils/bcrypt.js'
+import { hashPassword, comparePassword } from "../utils/bcrypt.js";
 import { createToken } from "../utils/jwt.js";
-import User from '../models/User.js'
-import Product from '../models/Product.js'
-import Category from '../models/Category.js'
+import User from "../models/User.js";
+import Product from "../models/Product.js";
+import Category from "../models/Category.js";
 import ProductImage from "../models/ProductImage.js";
 import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import OrderItem from "../models/OrderItem.js";
 import CartItem from "../models/CartItem.js";
 import { where } from "sequelize";
+import Razorpay from "razorpay";
 
 const createUser = async (req, res) => {
   try {
@@ -18,30 +19,49 @@ const createUser = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.json({ message: errors.array()[0].msg });
     }
-    let { name, email, password, cnfPassword, address } = req.body
+    let { name, email, password, cnfPassword, address } = req.body;
 
     let existingUser = await User.findOne({
-      where: { email }
-    })
-    if (existingUser) return res.json({ data: null, message: "email already registered", status: 400 })
-    if (password != cnfPassword) return res.json({ data: null, message: "password and confirm password did not match", status: 400 })
+      where: { email },
+    });
+    if (existingUser)
+      return res.json({
+        data: null,
+        message: "email already registered",
+        status: 400,
+      });
+    if (password != cnfPassword)
+      return res.json({
+        data: null,
+        message: "password and confirm password did not match",
+        status: 400,
+      });
 
     // password hashing
-    let hashedPassword = await hashPassword(password)
+    let hashedPassword = await hashPassword(password);
 
     // user creation
     const user = await User.create({
-      name, email, password: hashedPassword, address
-    })
-    if (!user) return res.json({ message: "error registering user", status: 500 })
+      name,
+      email,
+      password: hashedPassword,
+      address,
+    });
+    if (!user)
+      return res.json({ message: "error registering user", status: 500 });
 
     // token creation
-    const token = createToken(user.id, user.role)
-    return res.json({ data: user, message: "user registered successfully", status: 301, token })
+    const token = createToken(user.id, user.role);
+    return res.json({
+      data: user,
+      message: "user registered successfully",
+      status: 301,
+      token,
+    });
   } catch (err) {
-    return res.json({ message: err.message, status: 500 })
+    return res.json({ message: err.message, status: 500 });
   }
-}
+};
 
 const handleLogin = async (req, res) => {
   try {
@@ -50,30 +70,48 @@ const handleLogin = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.json({ success: false, message: errors.array()[0].msg });
     }
-    let { email, password } = req.body
+    let { email, password } = req.body;
 
     let user = await User.findOne({
-      where: { email }
-    })
+      where: { email },
+    });
 
-    if (!user) return res.json({ success: false, data: null, message: "Incorrect email or password", status: 400 })
+    if (!user)
+      return res.json({
+        success: false,
+        data: null,
+        message: "Incorrect email or password",
+        status: 400,
+      });
 
-    let isValidPassword = await comparePassword(password, user.password)
-    if (!isValidPassword) return res.json({ success: false, data: null, message: "Incorrect email or password", status: 400 })
+    let isValidPassword = await comparePassword(password, user.password);
+    if (!isValidPassword)
+      return res.json({
+        success: false,
+        data: null,
+        message: "Incorrect email or password",
+        status: 400,
+      });
 
     // token creation
-    const token = createToken(user.id, user.role)
+    const token = createToken(user.id, user.role);
     res.cookie("token", token, {
       httpOnly: true,
       secure: true, // Use true in production (only allows HTTPS)
       sameSite: "Strict",
     });
-    return res.json({ success: true, data: user, message: "Logged in successfully", status: 200, token })
+    return res.json({
+      success: true,
+      data: user,
+      message: "Logged in successfully",
+      status: 200,
+      token,
+    });
   } catch (err) {
-    console.log(err)
-    res.json({ success: false, message: err.message, status: 500 })
+    console.log(err);
+    res.json({ success: false, message: err.message, status: 500 });
   }
-}
+};
 
 const homePage = async (req, res) => {
   try {
@@ -81,48 +119,56 @@ const homePage = async (req, res) => {
     // console.log(token, "asdfds");
 
     let products = await Product.findAll({
-      where: { is_active: '1' },
-      include: [{ model: ProductImage }]
+      where: { is_active: "1" },
+      include: [{ model: ProductImage }],
     });
 
     res.json({
       message: "fetched all products",
       // role: localStorage.getItem("token"), // Include user details
       data: products,
-      status: 200
+      status: 200,
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching data", error });
   }
 };
 
-
 const logoutUser = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: true,
-    sameSite: "Strict"
+    sameSite: "Strict",
   });
 
-
-  return res.status(200).json({ success: true, message: "Logged out successfully", status: 200 });
+  return res
+    .status(200)
+    .json({ success: true, message: "Logged out successfully", status: 200 });
 };
 
 const addToCart = async (req, res) => {
   try {
     let userId = req.user.id;
-    if (!userId) return res.json({ success: false, message: "login to add product to cart" })
+    if (!userId)
+      return res.json({
+        success: false,
+        message: "login to add product to cart",
+      });
     let { product_id, quantity, cart_id } = req.body;
 
-
     let product = await Product.findOne({
-      where: { id: product_id }
-    })
+      where: { id: product_id },
+    });
 
-    if (product.stock < 1) return res.json({ success: false, message: "Not enough stock to add", status: 400 })
+    if (product.stock < 1)
+      return res.json({
+        success: false,
+        message: "Not enough stock to add",
+        status: 400,
+      });
 
     let existingCartItem = await CartItem.findOne({
-      where: { cart_id: cart_id, product_id: product_id }
+      where: { cart_id: cart_id, product_id: product_id },
     });
 
     if (existingCartItem) {
@@ -132,20 +178,20 @@ const addToCart = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "Cart updated successfully",
-        data: existingCartItem
+        data: existingCartItem,
       });
     } else {
       let newCartItem = await CartItem.create({
         // user_id: userId,
         cart_id: cart_id,
         product_id: product_id,
-        quantity: quantity || 1
+        quantity: quantity || 1,
       });
 
       return res.status(201).json({
         success: true,
         message: "Product added to cart",
-        data: newCartItem
+        data: newCartItem,
       });
     }
   } catch (error) {
@@ -153,13 +199,13 @@ const addToCart = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
 const listCart = async (req, res) => {
-  let userId = req.user.id
+  let userId = req.user.id;
 
   // let cart = await Cart.findOne({
   //   where: { user_id: userId },
@@ -184,14 +230,15 @@ const listCart = async (req, res) => {
           {
             model: Product,
             include: [ProductImage],
-          }
-        ]
-      }
-    ]
+          },
+        ],
+      },
+    ],
   });
 
-  if (cart) return res.json({ cart, success: true, message: "fetched cart details" })
-}
+  if (cart)
+    return res.json({ cart, success: true, message: "fetched cart details" });
+};
 
 const handleCheckOut = async (req, res) => {
   try {
@@ -199,16 +246,22 @@ const handleCheckOut = async (req, res) => {
 
     const cart = await Cart.findOne({
       where: { user_id: userId },
-      include: [{
-        model: CartItem,
-        include: [{ model: Product }]
-      }],
+      include: [
+        {
+          model: CartItem,
+          include: [{ model: Product }],
+        },
+      ],
     });
 
     console.log(JSON.stringify(cart, null, 2), " checkoutApi");
 
     if (cart.CartItems.length < 1) {
-      return res.json({ success: false, message: "Cart is empty", status: 400 });
+      return res.json({
+        success: false,
+        message: "Cart is empty",
+        status: 400,
+      });
     }
 
     let totalAmount = 0;
@@ -218,10 +271,36 @@ const handleCheckOut = async (req, res) => {
       totalAmount += item.quantity * item.Product.price;
     });
 
+
+
+    var RazorpayInstance = new Razorpay({
+      key_id: process.env.RAZORPAY_API_KEY,
+      key_secret: process.env.RAZORPAY_API_SECRET,
+    });
+
+    const razorpayRes = await RazorpayInstance.orders.create({
+      amount: totalAmount * 100,
+      currency: "INR",
+      notes: {
+        key1: "try k 1",
+        key2: "try k 2",
+      },
+    });
+
+    // console.log(razorpayRes,"hell yeah");
+    if (razorpayRes.hasOwnProperty("error")) {
+      return res.json({
+        success : false,
+        message : "Error while creating order",
+        data : razorpayRes
+      })
+    }
+
     const order = await Order.create({
       user_id: userId,
       total_amount: totalAmount,
       status: "Pending",
+      razorpay_order_id:razorpayRes.id
     });
 
     const orderItems = cart.CartItems.map((item) => ({
@@ -229,29 +308,42 @@ const handleCheckOut = async (req, res) => {
       product_id: item.product_id,
       product_name: item.Product.name,
       quantity: item.quantity,
-      price: item.Product.price
+      price: item.Product.price,
     }));
 
     await OrderItem.bulkCreate(orderItems);
 
+    
     // delete cart
-    await Cart.destroy({ where: { user_id: userId } });
+  //   await Cart.destroy({ where: { user_id: userId } });
 
-    // Decrement stock for all purchased products
-    await Promise.all(
-      orderItems.map(async (item) => {
-        await Product.decrement("stock", { by: item.quantity, where: { id: item.product_id } });
-      })
-    );
+  //   // Decrement stock for all purchased products
+  //   await Promise.all(
+  //     orderItems.map(async (item) => {
+  //       await Product.decrement("stock", {
+  //         by: item.quantity,
+  //         where: { id: item.product_id },
+  //       });
+  //     })
+  //   );
 
-    return res.json({ success: true, message: "Order placed successfully", order_id: order.id });
-
+    return res.json({
+      success: true,
+      message: "Order created successfully",
+      data: razorpayRes,
+    });
   } catch (error) {
     console.error("Checkout error:", error);
     res.json({ success: false, message: "Checkout failed", status: 500 });
   }
 };
 
-
-
-export { createUser, handleLogin, homePage, logoutUser, addToCart, listCart, handleCheckOut }
+export {
+  createUser,
+  handleLogin,
+  homePage,
+  logoutUser,
+  addToCart,
+  listCart,
+  handleCheckOut,
+};

@@ -4,6 +4,7 @@ import { storeContext } from "../context/storeContext";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-hot-toast";
 import { CartContext } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const { token, fetchToken, deleteToken } = useContext(storeContext);
@@ -14,6 +15,7 @@ const Cart = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const navigate = useNavigate()
 
   const fetchCartItems = async () => {
     if (!token) {
@@ -103,7 +105,8 @@ const Cart = () => {
         toast.error(response.data.message);
         return;
       } else if (response.data.success) {
-        toast.success("Order placed successfully!");
+        // toast.success("Order created successfully!");
+        navigate("/razorpay-checkout-page",{state : {response : response.data}})
         fetchCartItems();
         fetchCart()
       } else {

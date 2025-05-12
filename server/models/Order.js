@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import User from "./User.js";
+import { type } from "os";
 
 const Order = sequelize.define(
   "Order",
@@ -19,13 +20,22 @@ const Order = sequelize.define(
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM("pending", "shipped", "delivered", "cancelled"),
+      type: DataTypes.ENUM("pending", "shipped", "delivered", "cancelled","paid"),
       defaultValue: "pending",
+    },
+    razorpay_order_id: {
+      type: DataTypes.STRING
+    },
+
+    razorpay_payment_id: {
+      type: DataTypes.STRING
+
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
+    
   },
   { timestamps: false }
 );
