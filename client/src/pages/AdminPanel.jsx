@@ -9,7 +9,7 @@ const AdminPanel = () => {
   const { fetchToken, token } = useContext(storeContext)
   const [categories, setCategories] = useState([])
   const [products, setProducts] = useState([])
-  const [orders, setorders] = useState([])
+  const [orders, setOrders] = useState([])
 
   const checkUserRole = async () => {
     try {
@@ -82,6 +82,7 @@ const AdminPanel = () => {
     checkUserRole()
     fetchCategories()
     fetchProducts()
+    fetchOrders()
   }, [])
 
   return (
@@ -90,7 +91,7 @@ const AdminPanel = () => {
       <aside className="w-64 bg-white shadow-lg p-5 flex flex-col">
         <h2 className="text-2xl font-bold text-gray-700 mb-6">Admin Panel</h2>
         <nav className="space-y-4">
-          <Link to="/admin/dashboard" className="flex items-center gap-3 text-gray-700 p-2 hover:bg-gray-200 rounded">
+          <Link to="/admin" className="flex items-center gap-3 text-gray-700 p-2 hover:bg-gray-200 rounded">
             <Home size={20} /> Dashboard
           </Link>
           <Link to="/admin/categories" className="flex items-center gap-3 text-gray-700 p-2 hover:bg-gray-200 rounded">
@@ -101,9 +102,6 @@ const AdminPanel = () => {
           </Link>
           <Link to="/admin/orders" className="flex items-center gap-3 text-gray-700 p-2 hover:bg-gray-200 rounded">
             <ShoppingCart size={20} /> Manage Orders
-          </Link>
-          <Link to="/admin/users" className="flex items-center gap-3 text-gray-700 p-2 hover:bg-gray-200 rounded">
-            <Users size={20} /> User Management
           </Link>
         </nav>
       </aside>

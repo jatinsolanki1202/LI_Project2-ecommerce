@@ -16,6 +16,7 @@ import Contact from "./pages/Contact.jsx";
 import ProductDetails from './pages/ProductDetails.jsx'
 import Footer from './components/Footer.jsx'
 import RazorCheckoutPage from './pages/RazorCheckoutPage.jsx'
+import AdminCategoryPage from './pages/AdminCategoryPage.jsx'
 
 function App() {
 
@@ -33,6 +34,7 @@ function App() {
           <Route path='/admin' element={<AdminPanel />} />
           <Route path='/admin/login' element={<AdminLogin />} />
           <Route path='/admin/products' element={<AdminProductPage />} />
+          <Route path='/admin/categories' element={<AdminCategoryPage />} />
           <Route path='/about' element={<About />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/product/:id' element={<ProductDetails />} />

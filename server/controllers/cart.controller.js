@@ -1,5 +1,7 @@
 import Cart from "../models/Cart.js"
 import CartItem from "../models/CartItem.js"
+import Product from "../models/Product.js"
+import ProductImage from "../models/ProductImage.js"
 
 const removeItem = async (req, res) => {
   try {
@@ -31,7 +33,14 @@ const fetchCartItems = async (req, res) => {
       where: { user_id: userId },
       include: [{
         model: CartItem,
-        // as: 'cartItems' // optional alias, only if you defined one in association
+        include: [
+          {
+            model: Product,
+            include: [{
+              model: ProductImage
+            }]
+          }
+        ],
       }]
     });
 

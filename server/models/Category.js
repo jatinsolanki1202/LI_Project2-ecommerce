@@ -12,6 +12,10 @@ const categoryModel = sequelize.define('Category', {
     allowNull: false,
     unique: true
   },
+  description: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

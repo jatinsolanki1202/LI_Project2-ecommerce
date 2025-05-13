@@ -163,10 +163,75 @@ const fetchCategory = async (req, res) => {
   }
 }
 
+const createCategory = async (req, res) => {
+  try {
+    let { name, description } = req.body
+
+    // Validation check
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    let category = await Category.create({
+      name,
+      description
+    })
+
+    return res.json({ success: true, message: "Category created successfully", status: 200, data: category })
+
+  } catch (error) {
+    console.log("error creating category: ", error.message)
+  }
+}
+
+const editCategory = async (req, res) => {
+  try {
+    let { name, description } = req.body
+    let categoryId = req.params.categoryId
+
+    // Validation check
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    let category = await Category.update({
+      name,
+      description
+    }, {
+      where: { id: categoryId }
+    })
+
+    return res.json({ success: true, message: "Category updated successfully", status: 200 })
+
+  } catch (error) {
+    console.log("error updating category: ", error.message)
+  }
+}
+
+const deleteCategory = async (req, res) => {
+  try {
+    let categoryId = req.params.categoryId
+
+    await Category.destroy({
+      where: { id: categoryId }
+    })
+
+    return res.json({ success: true, message: "Category deleted successfully", status: 200 })
+
+  } catch (error) {
+    console.log("error deleting category: ", error.message)
+  }
+}
+
 export {
   addProduct,
   deleteProduct,
   editProduct,
   fetchCategory,
-  handleAdminLogin
+  handleAdminLogin,
+  createCategory,
+  editCategory,
+  deleteCategory
 }

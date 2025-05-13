@@ -1,5 +1,5 @@
 import express from 'express'
-import { addProduct, deleteProduct, editProduct, fetchCategory, handleAdminLogin } from '../controllers/admin.controller.js'
+import { addProduct, deleteProduct, editProduct, fetchCategory, handleAdminLogin, createCategory, editCategory, deleteCategory } from '../controllers/admin.controller.js'
 import { body, check } from 'express-validator'
 import adminAuth from '../middlewares/adminAuth.js'
 import loginAuth from '../middlewares/loginAuth.js'
@@ -34,6 +34,10 @@ router.post('/login', [
 ], handleAdminLogin)
 
 router.get('/category', fetchCategory)
+router.post('/category', createCategory)
+router.put('/category/:categoryId', editCategory)
+router.delete('/category/:categoryId', deleteCategory)
+
 
 router.post('/delete-product/:productId', loginAuth, adminAuth('admin'), deleteProduct)
 router.put('/edit-product/:productId', loginAuth, adminAuth('admin'), upload.array("images"), editProduct)
