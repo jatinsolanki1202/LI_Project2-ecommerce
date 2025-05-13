@@ -1,5 +1,5 @@
 import express from 'express'
-import { createUser, handleLogin, homePage, logoutUser, addToCart, listCart, handleCheckOut } from '../controllers/user.controller.js'
+import { createUser, handleLogin, homePage, logoutUser, addToCart, listCart, handleCheckOut ,getAddresses} from '../controllers/user.controller.js'
 import { body } from 'express-validator'
 import loginAuth from '../middlewares/loginAuth.js'
 
@@ -8,6 +8,7 @@ const router = express.Router()
 // GET Routes
 router.get('/home', homePage)
 router.get('/cart', loginAuth, listCart)
+router.get('/addresses', loginAuth, getAddresses)
 
 // POST Routes
 router.post('/register', [

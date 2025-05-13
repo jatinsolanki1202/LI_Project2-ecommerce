@@ -7,6 +7,7 @@ import Category from './Category.js';
 import ProductImage from './ProductImage.js';
 import Order from './Order.js';
 import OrderItem from './OrderItem.js';
+import Address from './Address.js';
 
 
 
@@ -34,7 +35,8 @@ Order.hasMany(OrderItem, { foreignKey: "order_id", onDelete: "CASCADE" });
 
 OrderItem.belongsTo(Product, { foreignKey: "product_id" });
 
-
+User.hasMany(Address, { foreignKey: "user_id", onDelete: "CASCADE" });
+Address.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" });
 export {
     sequelize,
     User,

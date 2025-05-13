@@ -11,6 +11,7 @@ import OrderItem from "../models/OrderItem.js";
 import CartItem from "../models/CartItem.js";
 import { where } from "sequelize";
 import Razorpay from "razorpay";
+import Address from "../models/Address.js";
 
 const createUser = async (req, res) => {
   try {
@@ -338,6 +339,25 @@ const handleCheckOut = async (req, res) => {
   }
 };
 
+const getAddresses = async(req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const addresses = await Address.findAll({
+      where: { user_id: userId },
+    });
+
+    if (addresses.length === 0) {
+      return res.json({ success: false, message: "No addresses found", data: [] });
+    }
+
+    res.status(200).json({ success: true, data: addresses });
+  } catch (error) {
+    console.error("Error fetching addresses:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
 export {
   createUser,
   handleLogin,
@@ -346,4 +366,5 @@ export {
   addToCart,
   listCart,
   handleCheckOut,
+  getAddresses
 };
