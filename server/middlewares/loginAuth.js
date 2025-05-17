@@ -3,13 +3,13 @@ import { verifyToken } from "../utils/jwt.js"
 const loginAuth = (req, res, next) => {
 
   try {
-    let token = req.headers.token    
+    let token = req.headers.token
     if (!token) return res.json({ message: "Please login again", status: 401 })
     let decoded = verifyToken(token)
 
     if (decoded.error) {
       res.clearCookie("token")
-      return res.json({ success: false, message: decoded.error })
+      return res.json({ success: false, message: decoded.error, status: 401 })
     }
     req.user = decoded
     next()

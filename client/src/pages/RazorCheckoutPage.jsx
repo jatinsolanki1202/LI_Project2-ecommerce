@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from 'react-hot-toast';
 import axiosInstance from '../utils/axiosInstance';
 import { useContext } from 'react';
@@ -12,6 +12,7 @@ const RazorCheckoutPage = () => {
   const { token } = useContext(storeContext);
   const { cart, fetchCart } = useContext(CartContext);
   const location = useLocation();
+  const navigate = useNavigate()
   const [activeStep, setActiveStep] = useState(1);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState({});
@@ -118,8 +119,28 @@ const RazorCheckoutPage = () => {
         currency: "INR",
         name: "Shopfinity",
         description: "Payment for your order",
-        handler: function (response) {
-          handlePaymentSuccess(response);
+        order_id: location.state.response.data.id,
+        // callback_url: "https://fitting-seagull-oddly.ngrok-free.app/razorpay/get-razorpay-res",
+        handler: async function (response) {
+          try {
+            // Verify payment on backend
+            const verificationResponse = await axiosInstance.post("/razorpay/get-razorpay-res", { ...response, cartId: cart.id, productId: cart.CartItems.Product }, {
+              headers: { token }
+            });
+
+            if (verificationResponse.data.success) {
+              toast.success("Payment successful! Order placed");
+              setIsOrderPlaced(true);
+              // Clear cart and redirect to home
+              fetchCart();
+              navigate('/', { replace: true });
+            } else {
+              toast.error("Payment verification failed");
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            toast.error("Payment verification failed");
+          }
         },
         prefill: {
           name: `${address.firstName} ${address.lastName}`,
@@ -141,8 +162,15 @@ const RazorCheckoutPage = () => {
 
   const handlePaymentSuccess = async (response) => {
     try {
+      console.log(response);
+
       // Add your payment verification API call here
-      setIsOrderPlaced(true);
+      const response2 = await axiosInstance.post("/razorpay/get-razorpay-res", response)
+      if (response2.data.success) {
+        setIsOrderPlaced(true);
+        toast.success("Payment successfull. Order placed")
+      }
+
     } catch (error) {
       console.error('Error:', error);
       toast.error('Payment verification failed');

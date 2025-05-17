@@ -38,6 +38,7 @@ app.use(cors({
   credentials: true,
 }))
 app.use(cookieParser())
+// app.use('/admin/*', loginAuth, adminAuth("admin"))
 app.use('/user', userRoutes)
 app.use('/admin', adminRoutes)
 app.use('/cart', cartRoutes)

@@ -8,6 +8,8 @@ import userModel from "../models/User.js";
 import dbConnection from '../config/db.js'
 import { comparePassword } from "../utils/bcrypt.js";
 import { createToken } from "../utils/jwt.js";
+import categoryModel from "../models/Category.js";
+import ProductImage from "../models/ProductImage.js";
 
 const handleAdminLogin = async (req, res) => {
   try {
@@ -155,7 +157,14 @@ const editProduct = async (req, res) => {
 
 const fetchCategory = async (req, res) => {
   try {
-    let categories = await Category.findAll({})
+    let categories = await Category.findAll({
+      include: [
+        {
+          model: Product,
+          where: { is_active: '1' }
+        }
+      ]
+    })
     res.json({ success: true, data: categories, message: "categories fetched", status: 200 })
 
   } catch (error) {
@@ -225,6 +234,29 @@ const deleteCategory = async (req, res) => {
   }
 }
 
+const getAllProducts = async (req, res) => {
+  try {
+
+    const products = await Product.findAll({
+      where: { is_active: '1' },
+      include: [
+        {
+          model: ProductImage
+        },
+        {
+          model: categoryModel,
+          attributes: ["id", "name"]
+        }
+      ]
+    });
+
+    return res.json({ success: true, data: products, status: 200 });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ success: false, message: "Error fetching products" });
+  }
+};
+
 export {
   addProduct,
   deleteProduct,
@@ -233,5 +265,6 @@ export {
   handleAdminLogin,
   createCategory,
   editCategory,
-  deleteCategory
+  deleteCategory,
+  getAllProducts
 }

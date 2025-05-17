@@ -1,15 +1,32 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Home, List, Package, ShoppingCart, Users } from "lucide-react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, LineElement, PointElement } from 'chart.js';
+import { Bar, Line, Doughnut } from 'react-chartjs-2';
+
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 import { storeContext } from "../context/storeContext";
+import AdminSidebar from "../components/AdminSidebar";
 const AdminPanel = () => {
+  ChartJS.register(
+    ArcElement,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    LineElement,
+    PointElement,
+    Title,
+    Tooltip,
+    Legend
+  );
   const navigate = useNavigate()
   const { fetchToken, token } = useContext(storeContext)
   const [categories, setCategories] = useState([])
   const [products, setProducts] = useState([])
   const [orders, setOrders] = useState([])
+  const [selectedProduct, setSelectedProduct] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
 
   const checkUserRole = async () => {
     try {
@@ -36,7 +53,7 @@ const AdminPanel = () => {
     try {
       const categoryResponse = await axiosInstance.get("/admin/category", {
         headers: {
-          token: token
+          token: localStorage.getItem("token")
         }
       })
       if (categoryResponse.data.success) {
@@ -85,26 +102,157 @@ const AdminPanel = () => {
     fetchOrders()
   }, [])
 
+  const categoryData = {
+    labels: categories.map(category => category.name),
+    datasets: [
+      {
+        label: 'Products',
+        data: categories.map(category => category?.Products?.length),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.6)',
+          'rgba(54, 162, 235, 0.6)',
+          'rgba(75, 192, 118, 0.6)',
+          'rgba(153, 102, 255, 0.6)',
+          'rgba(255, 159, 64, 0.6)',
+          'rgba(246, 55, 169, 0.59)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  }
+  console.log(products, "llllx");
+
+  const productOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Chart.js Bar Chart',
+      },
+    },
+  };
+
+  const productsData = {
+    labels: products?.map(product => product.name),
+    datasets: [
+      {
+        label: 'Sales',
+        data: products.map(product => {
+          const totalQuantity = orders?.reduce((sum, order) => {
+            const orderItems = order.OrderItems.filter(item => item.product_id === product.id);
+            return sum + orderItems.reduce((itemSum, item) => itemSum + item.quantity, 0);
+          }, 0);
+          return totalQuantity;
+        }),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }
+    ]
+
+  }
+
+  const getUniqueMonths = () => {
+    const uniqueMonths = [...new Set(orders?.map(order => {
+      const date = new Date(order.created_at);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    }))].sort().reverse();
+
+    return uniqueMonths;
+  };
+
+  const isDateInRange = (dateToCheck) => {
+    if (!startDate && !endDate) return true;
+
+    const orderDate = new Date(dateToCheck);
+    orderDate.setHours(0, 0, 0, 0);
+
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    if (end) end.setDate(end.getDate() + 1);
+
+    if (start && end) {
+      return orderDate >= start && orderDate < end;
+    } else if (start) {
+      return orderDate >= start;
+    } else if (end) {
+      return orderDate < end;
+    }
+    return true;
+  };
+
+  const ordersData = {
+    labels: orders
+      ?.filter(order => isDateInRange(order.created_at))
+      ?.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+      ?.map(order => {
+        const date = new Date(order.created_at);
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }),
+    datasets: [{
+      label: selectedProduct ?
+        `Orders for ${products.find(p => p.id === parseInt(selectedProduct))?.name || 'Selected Product'}` :
+        'Select a product',
+      data: orders
+        ?.filter(order => isDateInRange(order.created_at))
+        ?.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+        ?.map(order => {
+          const orderItems = order.OrderItems.filter(item =>
+            item.product_id === parseInt(selectedProduct)
+          );
+          return orderItems.reduce((sum, item) => sum + item.quantity, 0);
+        }),
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1,
+      fill: false
+    }]
+  }
+
+  const ordersOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0
+        }
+      },
+      x: {
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45
+        }
+      }
+    },
+    plugins: {
+      tooltip: {
+        enabled: true
+      },
+      legend: {
+        display: true,
+        position: 'top'
+      }
+    }
+  }
+
+  useEffect(() => {
+    console.log('Date Range:', { startDate, endDate });
+    console.log('Filtered Orders:', orders?.filter(order => isDateInRange(order.created_at)));
+  }, [startDate, endDate, orders]);
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg p-5 flex flex-col">
-        <h2 className="text-2xl font-bold text-gray-700 mb-6">Admin Panel</h2>
-        <nav className="space-y-4">
-          <Link to="/admin" className="flex items-center gap-3 text-gray-700 p-2 hover:bg-gray-200 rounded">
-            <Home size={20} /> Dashboard
-          </Link>
-          <Link to="/admin/categories" className="flex items-center gap-3 text-gray-700 p-2 hover:bg-gray-200 rounded">
-            <List size={20} /> Add Category
-          </Link>
-          <Link to="/admin/products" className="flex items-center gap-3 text-gray-700 p-2 hover:bg-gray-200 rounded">
-            <Package size={20} /> Add Products
-          </Link>
-          <Link to="/admin/orders" className="flex items-center gap-3 text-gray-700 p-2 hover:bg-gray-200 rounded">
-            <ShoppingCart size={20} /> Manage Orders
-          </Link>
-        </nav>
-      </aside>
+      <AdminSidebar />
 
       {/* Main Content */}
       <main className="flex-1 p-6">
@@ -112,18 +260,91 @@ const AdminPanel = () => {
         <p className="text-gray-600 mt-2">Manage your store efficiently from here.</p>
 
         {/* Dashboard Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <div className="bg-white shadow-lg rounded-lg p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <div className="bg-white shadow-lg rounded-lg p-6 h-[550px]">
             <h3 className="text-xl font-semibold text-gray-700">Total Categories</h3>
             <p className="text-2xl font-bold text-blue-600">{categories?.length}</p>
+            <div className="h-[300px] flex items-center justify-center">
+              <Doughnut className="mt-5" data={categoryData} options={{ responsive: true, maintainAspectRatio: false }} />
+            </div>
+            <h2>Categories</h2>
           </div>
-          <div className="bg-white shadow-lg rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-gray-700">Total Products</h3>
-            <p className="text-2xl font-bold text-green-600">{products?.length}</p>
-          </div>
-          <div className="bg-white shadow-lg rounded-lg p-6">
+
+          <div className="bg-white shadow-lg rounded-lg p-6 h-[550px]">
             <h3 className="text-xl font-semibold text-gray-700">Orders</h3>
             <p className="text-2xl font-bold text-red-600">{orders?.length}</p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Select Product
+                </label>
+                <select
+                  className="w-full px-2 py-1 border rounded-md text-sm"
+                  onChange={(e) => setSelectedProduct(e.target.value)}
+                  value={selectedProduct}
+                >
+                  <option value="">Select a product</option>
+                  {products?.map(product => (
+                    <option key={product.id} value={product.id}>
+                      {product.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full px-2 py-1 border rounded-md text-sm"
+                    value={startDate}
+                    onChange={(e) => {
+                      setStartDate(e.target.value);
+                      if (endDate && new Date(e.target.value) > new Date(endDate)) {
+                        setEndDate('');
+                      }
+                    }}
+                    max={endDate || undefined}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full px-2 py-1 border rounded-md text-sm"
+                    value={endDate}
+                    onChange={(e) => {
+                      setEndDate(e.target.value);
+                      if (startDate && new Date(startDate) > new Date(e.target.value)) {
+                        setStartDate('');
+                      }
+                    }}
+                    min={startDate || undefined}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="h-[300px] mt-4">
+              <Line
+                data={ordersData}
+                options={ordersOptions}
+              />
+            </div>
+          </div>
+
+          <div className="bg-white shadow-lg rounded-lg p-6 lg:col-span-2 h-[500px]">
+            <h3 className="text-xl font-semibold text-gray-700">Total Products</h3>
+            <p className="text-2xl font-bold text-green-600">{products?.length}</p>
+            <div className="h-[400px] w-full">
+              <Bar responsive={true} data={productsData} options={{ ...productOptions, maintainAspectRatio: false }} />
+            </div>
           </div>
         </div>
       </main>

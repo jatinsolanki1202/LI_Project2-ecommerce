@@ -1,5 +1,5 @@
 import express from 'express'
-import { addProduct, deleteProduct, editProduct, fetchCategory, handleAdminLogin, createCategory, editCategory, deleteCategory } from '../controllers/admin.controller.js'
+import { addProduct, deleteProduct, editProduct, fetchCategory, handleAdminLogin, createCategory, editCategory, deleteCategory, getAllProducts } from '../controllers/admin.controller.js'
 import { body, check } from 'express-validator'
 import adminAuth from '../middlewares/adminAuth.js'
 import loginAuth from '../middlewares/loginAuth.js'
@@ -33,7 +33,7 @@ router.post('/login', [
   body("password").notEmpty().withMessage("password is required")
 ], handleAdminLogin)
 
-router.get('/category', fetchCategory)
+router.get('/category', loginAuth, adminAuth("admin"), fetchCategory)
 router.post('/category', createCategory)
 router.put('/category/:categoryId', editCategory)
 router.delete('/category/:categoryId', deleteCategory)
@@ -41,5 +41,5 @@ router.delete('/category/:categoryId', deleteCategory)
 
 router.post('/delete-product/:productId', loginAuth, adminAuth('admin'), deleteProduct)
 router.put('/edit-product/:productId', loginAuth, adminAuth('admin'), upload.array("images"), editProduct)
-
+router.get('/products', loginAuth, adminAuth('admin'), getAllProducts)
 export default router

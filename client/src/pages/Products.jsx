@@ -123,11 +123,11 @@ const Products = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#f9f9f9] relative">
+    <div className="min-h-screen bg-[#f9f9f9] relative flex justify-between gap-0 w-full">
       {/* Mobile Sidebar Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className="md:hidden fixed bottom-4 right-4 z-50 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition-colors"
+        className="md:hidden fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-full hover:bg-blue-600 transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -156,7 +156,7 @@ const Products = () => {
       {/* Sidebar */}
       <div className={`
         transform transition-transform duration-300 ease-in-out
-        fixed top-0 left-0 h-screen bg-white shadow-lg z-50
+        fixed top-0 left-0 h-screen bg-white shadow-lg
         w-64 overflow-y-auto
         md:translate-x-0 md:transform-none md:relative md:block
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -183,7 +183,7 @@ const Products = () => {
               </svg>
             </button>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 ">
             {categories.map((category) => (
               <label key={category.id} className="flex items-center space-x-2 cursor-pointer">
                 <input
@@ -202,7 +202,7 @@ const Products = () => {
       </div>
 
       {/* Main Content */}
-      <div className="md:ml-64 p-4 md:p-8">
+      <div className="flex-1 p-4 md:p-6"> {/* Added flex-1 and margin-left for sidebar */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Products</h1>
           <p className="text-gray-600">
@@ -211,29 +211,29 @@ const Products = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
           {filteredProducts.map((product) => (
             <div
               key={product.id}
               className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
-              <div className="relative pb-[75%] md:pb-[100%]">
+              <div className="relative pb-[100%] group"> {/* Made square aspect ratio consistent */}
                 <img
                   src={`${url}/images/${product?.Product_Images[0]?.image_path}`}
                   alt={product.name}
-                  className="absolute top-0 left-0 w-full h-full object-cover"
+                  className="absolute top-0 left-0 w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div className="p-4">
                 <h3 className="text-lg font-bold text-gray-800 mb-2 truncate">
                   {product.name}
                 </h3>
-                <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                <p className="text-gray-600 text-sm line-clamp-2 mb-3 h-10"> {/* Fixed height for description */}
                   {product.description}
                 </p>
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-xl font-bold text-green-600">
-                    ₹{product.price}
+                    ₹{product.price.toLocaleString('en-IN')} {/* Added proper number formatting */}
                   </span>
                   <span className={`text-sm font-medium px-2 py-1 rounded-full ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
@@ -243,9 +243,9 @@ const Products = () => {
                 <button
                   onClick={() => addToCart(product, 1)}
                   disabled={product.stock === 0}
-                  className={`w-full py-2 px-4 rounded-lg font-semibold transition-colors ${product.stock === 0
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 ${product.stock === 0
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white transform hover:-translate-y-0.5'
                     }`}
                 >
                   {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}

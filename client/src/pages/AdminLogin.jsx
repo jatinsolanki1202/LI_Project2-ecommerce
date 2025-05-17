@@ -1,11 +1,13 @@
 import axios from "axios";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import axiosInstance from "../utils/axiosInstance";
+import { storeContext } from "../context/storeContext";
 
 const AdminLogin = () => {
+  const { token, fetchToken } = useContext(storeContext)
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
@@ -22,6 +24,7 @@ const AdminLogin = () => {
         toast.success(response.data.message);
         localStorage.setItem("token", response.data.token)
         navigate("/admin");
+        fetchToken()
       } else {
         toast.error(response.data.message);
       }
