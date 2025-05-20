@@ -116,7 +116,7 @@ const AdminPanel = () => {
           'rgba(255, 159, 64, 0.6)',
           'rgba(246, 55, 169, 0.59)',
         ],
-        borderWidth: 1,
+        borderWidth: 2,
       },
     ],
   }
@@ -244,6 +244,11 @@ const AdminPanel = () => {
     }
   }
 
+  let revenueSum = 0
+  for (let order of orders) {
+    revenueSum += Number(order.total_amount)
+  }
+
   useEffect(() => {
     console.log('Date Range:', { startDate, endDate });
     console.log('Filtered Orders:', orders?.filter(order => isDateInRange(order.created_at)));
@@ -339,11 +344,85 @@ const AdminPanel = () => {
             </div>
           </div>
 
+          {/* Orders chart */}
           <div className="bg-white shadow-lg rounded-lg p-6 lg:col-span-2 h-[500px]">
-            <h3 className="text-xl font-semibold text-gray-700">Total Products</h3>
-            <p className="text-2xl font-bold text-green-600">{products?.length}</p>
+            <h3 className="text-xl font-semibold text-gray-700">Total Orders Chart</h3>
+            <h5 className="text-md font-semibold text-gray-700"> Total products: <span className="text-blue-600">{products?.length}</span></h5>
+            {/* <p className="text-2xl font-bold text-green-600">{products?.length}</p> */}
             <div className="h-[400px] w-full">
               <Bar responsive={true} data={productsData} options={{ ...productOptions, maintainAspectRatio: false }} />
+            </div>
+          </div>
+
+          {/* Sales Chart */}
+
+
+          <div className="bg-white shadow-lg rounded-lg p-6 lg:col-span-2 h-[500px]">
+            <h3 className="text-xl font-semibold text-gray-700">Product Revenue Analysis</h3>
+            <h5 className="text-md font-semibold text-gray-700">
+              Total revenue: <span className="text-blue-600">
+                ₹ {Number(revenueSum).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </h5>
+
+            <div className="h-[400px] w-full mt-4">
+              <Bar
+                data={{
+                  labels: products?.map(product => product.name) || [],
+                  datasets: [{
+                    label: 'Revenue (₹)',
+                    data: products?.map(product => {
+                      // Calculate total revenue for each product
+                      const revenue = orders?.reduce((totalRevenue, order) => {
+                        // Get all order items for this product
+                        const productItems = order.OrderItems?.filter(item =>
+                          item.product_id === product.id
+                        );
+                        // Since price is not saved in OrderItems, get price from the product object
+                        // Calculate revenue for this product in this order
+                        const orderRevenue = productItems.reduce((sum, item) =>
+                          sum + (Number(product.price) * Number(item.quantity)), 0
+                        );
+
+                        return totalRevenue + orderRevenue;
+                      }, 0) || 0;
+                      return revenue;
+                    }) || [],
+                    backgroundColor: 'rgba(47, 109, 171, 0.6)',
+                    borderColor: 'rgb(42, 104, 191)',
+                    borderWidth: 1
+                  }]
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: 'Revenue (₹)'
+                      }
+                    }
+                  },
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Product Revenue Distribution'
+                    },
+                    tooltip: {
+                      callbacks: {
+                        label: function (context) {
+                          return `Revenue: ₹${context.raw.toFixed(2)}`;
+                        }
+                      }
+                    }
+                  }
+                }}
+              />
             </div>
           </div>
         </div>
