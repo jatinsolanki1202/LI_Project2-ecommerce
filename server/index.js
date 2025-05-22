@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true }))
 
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "ecommerce-project-1-client.vercel.app",
   credentials: true,
 }))
 app.use(cookieParser())
