@@ -23,7 +23,7 @@ dotenv.config()
 
 
 const corsOpts = {
-  origin: '*',
+  origin: 'https://ecommerce-project-1-client.vercel.app',
   credentials: true,
   methods: ['GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type'],
