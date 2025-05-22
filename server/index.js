@@ -20,20 +20,21 @@ syncDatabase()
 
 const app = express()
 dotenv.config()
-// DB Connection
-// dbConnection.query("SELECT 1")
-//   .then(() => console.log("DB Connected"))
-//   .catch((err) => console.log("DB connection error: ", err))
+
+
+const corsOpts = {
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type'],
+  exposedHeaders: ['Content-Type']
+};
+app.use(cors(corsOpts))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-// sequelize.authenticate()
-//   .then(() => console.log('DB Connected'))
-//   .catch((err) => console.log('DB Connection error: ', err))
 
-
-
-app.use(cors())
+// app.use(cors())
 app.use(cookieParser())
 // app.use('/admin/*', loginAuth, adminAuth("admin"))
 app.use('/user', userRoutes)
