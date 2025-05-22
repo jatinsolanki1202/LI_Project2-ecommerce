@@ -24,12 +24,12 @@ dotenv.config()
 
 const corsOpts = {
   origin: 'https://ecommerce-project-1-client.vercel.app',
-  credentials: true,
-  methods: ['GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
-  exposedHeaders: ['Content-Type']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
-app.use(cors(corsOpts))
+
+app.use(cors(corsOpts));
+app.options('*', cors(corsOpts));
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
