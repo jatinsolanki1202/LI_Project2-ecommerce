@@ -33,10 +33,7 @@ app.use(express.urlencoded({ extended: true }))
 
 
 
-app.use(cors({
-  origin: "ecommerce-project-1-client.vercel.app",
-  credentials: true,
-}))
+app.use(cors())
 app.use(cookieParser())
 // app.use('/admin/*', loginAuth, adminAuth("admin"))
 app.use('/user', userRoutes)
