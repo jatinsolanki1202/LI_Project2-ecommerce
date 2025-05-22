@@ -17,7 +17,6 @@ const CartContextProvider = ({ children }) => {
     setCart(response.data.data)
     setCartLength(response.data.data?.CartItems?.length)
 
-
   }
 
   useEffect(() => {
