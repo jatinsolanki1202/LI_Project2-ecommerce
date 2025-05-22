@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import axiosInstance from "../utils/axiosInstance";
-import { storeContext } from "../context/storeContext";
+import { storeContext } from "../context/StoreContext.jsx";
 
 const AdminLogin = () => {
   const { token, fetchToken } = useContext(storeContext)

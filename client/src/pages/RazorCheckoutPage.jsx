@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from 'react-hot-toast';
 import axiosInstance from '../utils/axiosInstance';
 import { useContext } from 'react';
-import { storeContext } from '../context/storeContext';
+import { storeContext } from '../context/StoreContext.jsx';
 import { loadScript } from '../utils/scriptLoader';
 import { CartContext } from '../context/CartContext.jsx';
 

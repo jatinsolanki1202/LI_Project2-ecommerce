@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
-import { storeContext } from "../context/storeContext";
+import { storeContext } from "../context/StoreContext.jsx";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-hot-toast";
 import { CartContext } from "../context/CartContext.jsx";

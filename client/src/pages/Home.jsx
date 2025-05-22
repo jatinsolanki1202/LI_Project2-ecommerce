@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance.js";
-import { storeContext } from "../context/storeContext.jsx";
+import { storeContext } from "../context/StoreContext.jsx";
 import toast from "react-hot-toast";
 import Hero from "../components/Hero.jsx";
 import { CartContext } from "../context/CartContext.jsx";

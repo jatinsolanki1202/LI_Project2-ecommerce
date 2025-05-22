@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { storeContext } from "../context/storeContext";
+import { storeContext } from "../context/StoreContext.jsx";
 import { CartContext } from "../context/CartContext.jsx";
 
 const LoginPage = () => {

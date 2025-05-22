@@ -5,7 +5,7 @@ import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import toast from "react-hot-toast";
-import { storeContext } from "../context/storeContext";
+import { storeContext } from "../context/StoreContext.jsx";
 import AdminSidebar from "../components/AdminSidebar";
 const AdminPanel = () => {
   ChartJS.register(

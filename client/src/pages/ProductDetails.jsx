@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import { CartContext } from '../context/CartContext.jsx';
-import { storeContext } from '../context/storeContext';
+import { storeContext } from '../context/StoreContext.jsx';
 import toast from 'react-hot-toast';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';

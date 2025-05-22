@@ -1,6 +1,6 @@
 import { BrowserRouter } from 'react-router-dom'
 import { createRoot } from 'react-dom/client'
-import { ContextProvider } from './context/storeContext.jsx'
+import { ContextProvider } from './context/StoreContext.jsx'
 import { ProductContextProvider } from './context/ProductContext.jsx'
 import './index.css'
 import App from './App.jsx'

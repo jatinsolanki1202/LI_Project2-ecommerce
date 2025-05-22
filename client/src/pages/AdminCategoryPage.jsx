@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance.js";
 import { MdEdit, MdDelete } from "react-icons/md";
-import { storeContext } from "../context/storeContext.jsx";
+import { storeContext } from "../context/StoreContext.jsx";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
