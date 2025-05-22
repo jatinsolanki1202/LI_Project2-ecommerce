@@ -116,7 +116,7 @@ const AdminPanel = () => {
           'rgba(255, 159, 64, 0.6)',
           'rgba(246, 55, 169, 0.59)',
         ],
-        borderWidth: 2,
+        borderWidth: 4,
       },
     ],
   }

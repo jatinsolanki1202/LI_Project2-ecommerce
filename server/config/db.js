@@ -1,17 +1,18 @@
 import mysql from 'mysql2/promise'
+import fs from 'fs';
 import Sequelize from 'sequelize';
 import dotenv from "dotenv";
 dotenv.config();
 
-// const connection = mysql.createPool({
+// const sequelize = mysql.createPool({
 //   host: process.env.DB_HOST,
 //   user: process.env.DB_USERNAME,
 //   password: process.env.DB_PASSWORD,
 //   database: process.env.DB_DATABASE,
-//   // ssl: {
-//   //   rejectUnauthorized: true, // Ensures secure connection
-//   //   ca: fs.readFileSync(process.env.CA), // Read SSL certificate file
-//   // },
+//   ssl: {
+//     rejectUnauthorized: true, // Ensures secure connection
+//     ca: fs.readFileSync(process.env.CA), // Read SSL certificate file
+//   },
 // })
 
 const sequelize = new Sequelize(
@@ -21,7 +22,13 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: "mysql",
-    logging: false
+    logging: false,
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: true,
+        ca: fs.readFileSync(process.env.CA).toString()
+      }
+    }
   }
 )
 
