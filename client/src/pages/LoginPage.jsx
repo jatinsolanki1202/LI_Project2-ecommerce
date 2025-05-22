@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { storeContext } from "../context/storeContext";
-import { CartContext } from "../context/CartContext";
+import { CartContext } from "../context/CartContext.jsx";
 
 const LoginPage = () => {
   const { setToken } = useContext(storeContext);

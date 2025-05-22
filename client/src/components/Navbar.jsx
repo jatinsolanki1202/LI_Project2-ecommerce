@@ -35,7 +35,7 @@ const Navbar = () => {
       if (response.data.user) {
         setUserRole(response.data.user?.role);
       }
-      
+
       if (response.data.user?.role == "admin") {
         setIsAdmin(true)
       }

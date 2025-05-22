@@ -5,7 +5,7 @@ import axiosInstance from '../utils/axiosInstance';
 import { useContext } from 'react';
 import { storeContext } from '../context/storeContext';
 import { loadScript } from '../utils/scriptLoader';
-import { CartContext } from '../context/CartContext';
+import { CartContext } from '../context/CartContext.jsx';
 
 
 const RazorCheckoutPage = () => {

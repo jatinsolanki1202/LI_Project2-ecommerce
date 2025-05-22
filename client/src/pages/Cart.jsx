@@ -3,7 +3,7 @@ import axiosInstance from "../utils/axiosInstance";
 import { storeContext } from "../context/storeContext";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-hot-toast";
-import { CartContext } from "../context/CartContext";
+import { CartContext } from "../context/CartContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
@@ -106,7 +106,7 @@ const Cart = () => {
         return;
       } else if (response.data.success) {
         // toast.success("Order created successfully!");
-        navigate("/razorpay-checkout-page",{state : {response : response.data}})
+        navigate("/razorpay-checkout-page", { state: { response: response.data } })
         fetchCartItems();
         fetchCart()
       } else {
