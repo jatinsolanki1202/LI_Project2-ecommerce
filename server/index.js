@@ -21,15 +21,15 @@ syncDatabase()
 const app = express()
 dotenv.config()
 
-// const corsOpts = {
-//   origin: 'https://ecommerce-project-1-client.vercel.app', // your frontend domain
-//   credentials: false,
-//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//   allowedHeaders: ['Content-Type']
-// };
+const corsOpts = {
+  origin: 'https://ecommerce-project-1-client.vercel.app', // your frontend domain
+  credentials: false,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'token']
+};
 
-// app.use(cors(corsOpts));
-// app.options('*', cors(corsOpts));
+app.use(cors(corsOpts));
+app.options('*', cors(corsOpts));
 
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
