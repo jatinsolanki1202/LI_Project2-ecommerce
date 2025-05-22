@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { CartContext } from "../context/CartContext.jsx";
 
 const Products = () => {
-  const url = "http://127.0.0.1:8000";
+  const url = "https://ecommerce-project-1-rho.vercel.app";
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState(new Set());

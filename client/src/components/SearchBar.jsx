@@ -8,7 +8,7 @@ const SearchBar = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const searchRef = useRef(null);
     const navigate = useNavigate();
-    const url = "http://127.0.0.1:8000";
+    const url = "https://ecommerce-project-1-rho.vercel.app";
 
     useEffect(() => {
         const handleClickOutside = (event) => {

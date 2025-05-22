@@ -8,7 +8,7 @@ import { CartContext } from "../context/CartContext.jsx";
 
 const Home = () => {
   const navigate = useNavigate();
-  const url = "http://127.0.0.1:8000";
+  const url = "https://ecommerce-project-1-rho.vercel.app";
   const [products, setProducts] = useState([]);
   const { token, fetchToken, deleteToken } = useContext(storeContext);
   const { fetchCart, cart, cartItems } = useContext(CartContext);

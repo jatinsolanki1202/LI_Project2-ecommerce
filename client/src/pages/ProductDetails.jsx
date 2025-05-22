@@ -16,7 +16,7 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const { fetchCart } = useContext(CartContext);
   const { deleteToken } = useContext(storeContext);
-  const url = "http://127.0.0.1:8000";
+  const url = "https://ecommerce-project-1-rho.vercel.app";
 
   useEffect(() => {
     fetchProductDetails();
