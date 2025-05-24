@@ -27,7 +27,7 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: "mysql",
-    dialectModule: require('mysql2'),
+    dialectModule: (await import('mysql2')).default,
     logging: false,
     dialectOptions: {
       ssl: {
