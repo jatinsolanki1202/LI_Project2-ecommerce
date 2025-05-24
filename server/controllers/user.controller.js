@@ -291,17 +291,17 @@ const handleCheckOut = async (req, res) => {
     // console.log(razorpayRes,"hell yeah");
     if (razorpayRes.hasOwnProperty("error")) {
       return res.json({
-        success : false,
-        message : "Error while creating order",
-        data : razorpayRes
+        success: false,
+        message: "Error while creating order",
+        data: razorpayRes
       })
     }
 
     const order = await Order.create({
       user_id: userId,
       total_amount: totalAmount,
-      status: "Pending",
-      razorpay_order_id:razorpayRes.id
+      status: "pending",
+      razorpay_order_id: razorpayRes.id
     });
 
     const orderItems = cart.CartItems.map((item) => ({
@@ -314,19 +314,19 @@ const handleCheckOut = async (req, res) => {
 
     await OrderItem.bulkCreate(orderItems);
 
-    
-    // delete cart
-  //   await Cart.destroy({ where: { user_id: userId } });
 
-  //   // Decrement stock for all purchased products
-  //   await Promise.all(
-  //     orderItems.map(async (item) => {
-  //       await Product.decrement("stock", {
-  //         by: item.quantity,
-  //         where: { id: item.product_id },
-  //       });
-  //     })
-  //   );
+    // delete cart
+    //   await Cart.destroy({ where: { user_id: userId } });
+
+    //   // Decrement stock for all purchased products
+    //   await Promise.all(
+    //     orderItems.map(async (item) => {
+    //       await Product.decrement("stock", {
+    //         by: item.quantity,
+    //         where: { id: item.product_id },
+    //       });
+    //     })
+    //   );
 
     return res.json({
       success: true,
@@ -339,7 +339,7 @@ const handleCheckOut = async (req, res) => {
   }
 };
 
-const getAddresses = async(req, res) => {
+const getAddresses = async (req, res) => {
   try {
     const userId = req.user.id;
 
