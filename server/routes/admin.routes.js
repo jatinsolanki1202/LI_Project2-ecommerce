@@ -7,16 +7,7 @@ import multer from 'multer'
 
 const router = express.Router()
 
-const storage = multer.diskStorage({
-  destination: "uploads",
-  filename: function (req, file, cb) {
-    try {
-      return cb(null, `${Date.now()}${file.originalname}`)
-    } catch (err) {
-      console.log(err.message)
-    }
-  }
-})
+const storage = multer.memoryStorage()
 
 const upload = multer({ storage: storage })
 

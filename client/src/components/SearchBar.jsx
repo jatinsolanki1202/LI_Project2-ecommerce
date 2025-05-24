@@ -80,7 +80,7 @@ const SearchBar = ({ isOpen, onClose }) => {
                                     className="flex items-center gap-4 p-4 hover:bg-gray-50 cursor-pointer"
                                 >
                                     <img
-                                        src={`${url}/images/${product?.Product_Images[0]?.image_path}`}
+                                        src={`${product?.Product_Images[0]?.image_path}`}
                                         alt={product.name}
                                         className="w-16 h-16 object-contain"
                                     />

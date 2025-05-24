@@ -219,7 +219,7 @@ const Products = () => {
             >
               <div className="relative pb-[100%] group"> {/* Made square aspect ratio consistent */}
                 <img
-                  src={`${url}/images/${product?.Product_Images[0]?.image_path}`}
+                  src={`${product?.Product_Images[0]?.image_path}`}
                   alt={product.name}
                   className="absolute top-0 left-0 w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
                 />

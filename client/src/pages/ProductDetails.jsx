@@ -114,7 +114,7 @@ const ProductDetails = () => {
                 {product.Product_Images && product.Product_Images.map((image, index) => (
                   <SwiperSlide key={index}>
                     <img
-                      src={`${url}/images/${image.image_path}`}
+                      src={`${image.image_path}`}
                       alt={`${product.name} - Image ${index + 1}`}
                       className="w-full h-full object-contain"
                     />

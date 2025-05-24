@@ -96,7 +96,7 @@ const Home = () => {
             >
               <div onClick={() => navigate(`/product/${product.id}`)} className="cursor-pointer">
                 <img
-                  src={`${url}/images/${product?.Product_Images[0]?.image_path}`}
+                  src={`${product?.Product_Images[0]?.image_path}`}
                   alt={product.name}
                   className="object-contain h-60 w-full"
                 />
