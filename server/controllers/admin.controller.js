@@ -2,8 +2,6 @@ import { validationResult } from "express-validator"
 import Product from "../models/Product.js";
 import Category from "../models/Category.js";
 import ProductImageModel from "../models/ProductImage.js";
-import fs from 'fs'
-import axiosInstance from "../../client/src/utils/axiosInstance.js";
 import userModel from "../models/User.js";
 import dbConnection from '../config/db.js'
 import { comparePassword } from "../utils/bcrypt.js";
