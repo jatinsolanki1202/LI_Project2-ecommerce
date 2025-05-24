@@ -417,7 +417,7 @@ const RazorCheckoutPage = () => {
                     <div key={item.id} className="flex justify-between items-center py-3 border-b">
                       <div className="flex items-center space-x-4">
                         <img
-                          src={`https://ecommerce-project-1-rho.vercel.app/images/${item.Product.Product_Images?.[0]?.image_path}`}
+                          src={`https://www.ecomm-project-server.com/images/${item.Product.Product_Images?.[0]?.image_path}`}
                           alt={item.Product?.name}
                           className="w-16 h-16 object-cover rounded-md"
                         />

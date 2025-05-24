@@ -300,7 +300,7 @@ const AdminProductPage = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex-shrink-0 h-10 w-10">
                             <img
-                              src={`https://ecommerce-project-1-rho.vercel.app/images/${product.Product_Images[0]?.image_path}`}
+                              src={`https://www.ecomm-project-server.com/images/${product.Product_Images[0]?.image_path}`}
                               alt={product.name}
                               className="h-10 w-10 rounded-md object-contain"
                             />

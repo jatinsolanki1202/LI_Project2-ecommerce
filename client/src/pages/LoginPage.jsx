@@ -31,7 +31,7 @@ const LoginPage = () => {
   async function handleLogin(e) {
     e.preventDefault();
     try {
-      const response = await axios.post('https://ecommerce-project-1-rho.vercel.app/user/login', loginUser);
+      const response = await axios.post('https://www.ecomm-project-server.com/user/login', loginUser);
       if (response.data.success) {
         toast.success(response.data.message);
         localStorage.setItem('token', response.data.token);
@@ -50,7 +50,7 @@ const LoginPage = () => {
   async function handleRegister(e) {
     e.preventDefault();
     try {
-      const response = await axios.post('https://ecommerce-project-1-rho.vercel.app/user/register', registerUser);
+      const response = await axios.post('https://www.ecomm-project-server.com/user/register', registerUser);
       if (response.data.status < 400) {
         toast.success(response.data.message);
         localStorage.setItem("token", response.data.token);
