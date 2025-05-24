@@ -4,7 +4,7 @@ import axiosInstance from "../utils/axiosInstance";
 export const productContext = createContext(null)
 
 const ProductContextProvider = ({ children }) => {
-  const url = 'https://www.ecomm-project-server.com'
+  const url = 'https://ecommerce-project-1-rho.vercel.app'
   const [products, setProducts] = useState([])
 
   const fetchProducts = async () => {

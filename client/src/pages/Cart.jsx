@@ -144,7 +144,7 @@ const Cart = () => {
                 className="flex items-center justify-between gap-2 bg-gray-200 text-gray-900 p-4 shadow-md rounded-lg"
               >
                 <img
-                  src={`https://www.ecomm-project-server.com/images/${item.Product.Product_Images[0]?.image_path}`}
+                  src={`https://ecommerce-project-1-rho.vercel.app/images/${item.Product.Product_Images[0]?.image_path}`}
                   alt={item.Product.name}
                   className="h-16 w-16 object-contain rounded"
                 />
