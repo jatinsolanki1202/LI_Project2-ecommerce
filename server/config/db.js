@@ -26,7 +26,7 @@ const sequelize = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: (await import('mysql2')).default,
+    dialect: "mysql",
     logging: false,
     port: process.env.DB_PORT,
     dialectOptions: {
