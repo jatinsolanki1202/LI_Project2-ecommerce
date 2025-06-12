@@ -1,10 +1,11 @@
 import { BrowserRouter } from 'react-router-dom'
 import { createRoot } from 'react-dom/client'
-import { ContextProvider } from './context/storeContext.jsx'
+import { ContextProvider } from './context/StoreContext.jsx'
 import { ProductContextProvider } from './context/ProductContext.jsx'
 import './index.css'
 import App from './App.jsx'
 import { CartContextProvider } from './context/CartContext.jsx'
+
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -15,5 +16,5 @@ createRoot(document.getElementById('root')).render(
         </CartContextProvider>
       </ProductContextProvider>
     </ContextProvider>
-  </BrowserRouter >
+  </BrowserRouter>
 )

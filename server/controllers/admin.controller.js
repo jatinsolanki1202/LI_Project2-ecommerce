@@ -2,14 +2,13 @@ import { validationResult } from "express-validator"
 import Product from "../models/Product.js";
 import Category from "../models/Category.js";
 import ProductImageModel from "../models/ProductImage.js";
-import fs from 'fs'
-import axiosInstance from "../../client/src/utils/axiosInstance.js";
 import userModel from "../models/User.js";
 import dbConnection from '../config/db.js'
 import { comparePassword } from "../utils/bcrypt.js";
 import { createToken } from "../utils/jwt.js";
 import categoryModel from "../models/Category.js";
 import ProductImage from "../models/ProductImage.js";
+import cloudinary from "../config/cloudinary.js";
 
 const handleAdminLogin = async (req, res) => {
   try {
@@ -48,7 +47,14 @@ const addProduct = async (req, res) => {
   try {
     let { name, price, description, stock, category } = req.body;
 
-    let images = req.files
+    const images = await Promise.all(
+      req.files.map((file) => {
+        const fileStr = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+        return cloudinary.uploader.upload(fileStr, {
+          folder: 'ecomm-project-1',
+        });
+      })
+    );
     // Validation check
     const errors = validationResult(req);
 
@@ -73,11 +79,13 @@ const addProduct = async (req, res) => {
     });
 
     let productImages = []
-    images.map((image) => productImages.push({ image_path: image.filename, product_id: product.id }))
+
+    images.map((image) => productImages.push({ image_path: image.secure_url, product_id: product.id }))
     await ProductImageModel.bulkCreate(productImages)
     return res.status(201).json({ success: true, message: "Product added successfully!", product });
 
   } catch (err) {
+    console.error("Add Product Error:", err);
     return res.status(500).json({ success: false, message: "Server Error", err });
   }
 };
@@ -104,7 +112,14 @@ const editProduct = async (req, res) => {
 
     let { name, price, description, stock, category } = req.body;
 
-    let images = req.files || [];
+    const images = await Promise.all(
+      req.files.map((file) => {
+        const fileStr = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+        return cloudinary.uploader.upload(fileStr, {
+          folder: 'ecomm-project-1',
+        });
+      })
+    );
 
     // Validation check
     const errors = validationResult(req);
@@ -130,22 +145,24 @@ const editProduct = async (req, res) => {
       { where: { id: productId } }
     );
 
-    if (updated == 0 || updated == '0') {
-      return res.json({ success: true, message: "No changes detected, product saved", status: 200 });
-    }
-
     // If images are provided, delete old images and insert new ones
     if (images.length > 0) {
 
       // Delete old images
-      await ProductImageModel.destroy({ where: { product_id: productId } });
+      // await ProductImageModel.destroy({ where: { product_id: productId } });
 
       // Add new images
       let productImages = images.map((image) => ({
-        image_path: image.filename,
+        image_path: image.secure_url,
         product_id: productId,
       }));
+
       await ProductImageModel.bulkCreate(productImages);
+
+
+      if (updated == 0 || updated == '0') {
+        return res.json({ success: true, message: "No changes detected, product saved", status: 200 });
+      }
     }
 
     return res.status(200).json({ success: true, message: "Product updated successfully!" });

@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import axiosInstance from "../utils/axiosInstance";
-import { storeContext } from "./storeContext";
+import { storeContext } from "./StoreContext.jsx";
 
 export const CartContext = createContext(null)
 
@@ -16,7 +16,6 @@ const CartContextProvider = ({ children }) => {
 
     setCart(response.data.data)
     setCartLength(response.data.data?.CartItems?.length)
-
 
   }
 

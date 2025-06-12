@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
-import { CartContext } from '../context/CartContext';
-import { storeContext } from '../context/storeContext';
+import { CartContext } from '../context/CartContext.jsx';
+import { storeContext } from '../context/StoreContext.jsx';
 import toast from 'react-hot-toast';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -16,7 +16,7 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const { fetchCart } = useContext(CartContext);
   const { deleteToken } = useContext(storeContext);
-  const url = "http://127.0.0.1:8000";
+  const url = "https://ecommerce-project-1-rho.vercel.app";
 
   useEffect(() => {
     fetchProductDetails();
@@ -114,7 +114,7 @@ const ProductDetails = () => {
                 {product.Product_Images && product.Product_Images.map((image, index) => (
                   <SwiperSlide key={index}>
                     <img
-                      src={`${url}/images/${image.image_path}`}
+                      src={`${image.image_path}`}
                       alt={`${product.name} - Image ${index + 1}`}
                       className="w-full h-full object-contain"
                     />

@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
-import { storeContext } from "../context/storeContext";
+import { storeContext } from "../context/StoreContext.jsx";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-hot-toast";
-import { CartContext } from "../context/CartContext";
+import { CartContext } from "../context/CartContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
@@ -106,7 +106,7 @@ const Cart = () => {
         return;
       } else if (response.data.success) {
         // toast.success("Order created successfully!");
-        navigate("/razorpay-checkout-page",{state : {response : response.data}})
+        navigate("/razorpay-checkout-page", { state: { response: response.data } })
         fetchCartItems();
         fetchCart()
       } else {
@@ -144,7 +144,7 @@ const Cart = () => {
                 className="flex items-center justify-between gap-2 bg-gray-200 text-gray-900 p-4 shadow-md rounded-lg"
               >
                 <img
-                  src={`http://127.0.0.1:8000/images/${item.Product.Product_Images[0]?.image_path}`}
+                  src={`${item.Product.Product_Images[0]?.image_path}`}
                   alt={item.Product.name}
                   className="h-16 w-16 object-contain rounded"
                 />

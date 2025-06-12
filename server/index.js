@@ -16,27 +16,27 @@ import loginAuth from './middlewares/loginAuth.js';
 import { getAllProducts, getSingleProduct } from "./controllers/product.controller.js"
 
 syncDatabase()
-// import syncDatabase from './sync.js'
 
 const app = express()
 dotenv.config()
-// DB Connection
-// dbConnection.query("SELECT 1")
-//   .then(() => console.log("DB Connected"))
-//   .catch((err) => console.log("DB connection error: ", err))
+
+const allowedOrigins = ['https://ecommerce-project-1-client.vercel.app'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-// sequelize.authenticate()
-//   .then(() => console.log('DB Connected'))
-//   .catch((err) => console.log('DB Connection error: ', err))
 
-
-
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-}))
 app.use(cookieParser())
 // app.use('/admin/*', loginAuth, adminAuth("admin"))
 app.use('/user', userRoutes)

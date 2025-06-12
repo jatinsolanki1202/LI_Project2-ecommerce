@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance.js";
-import { storeContext } from "../context/storeContext.jsx";
+import { storeContext } from "../context/StoreContext.jsx";
 import logo from '../assets/images/logo.png';
 import searchIcon from '../assets/images/search_icon.png';
 import profileIcon from '../assets/images/profile_icon.png';
@@ -35,7 +35,7 @@ const Navbar = () => {
       if (response.data.user) {
         setUserRole(response.data.user?.role);
       }
-      
+
       if (response.data.user?.role == "admin") {
         setIsAdmin(true)
       }

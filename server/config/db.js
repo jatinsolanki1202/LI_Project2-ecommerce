@@ -15,6 +15,11 @@ dotenv.config();
 //   },
 // })
 
+
+let secret = `-----BEGIN CERTIFICATE-----\n`
+secret += process.env.SQL_SECRET_KEY.toString()
+secret += `\n-----END CERTIFICATE-----`
+
 const sequelize = new Sequelize(
   process.env.DB_DATABASE,
   process.env.DB_USERNAME,
@@ -22,12 +27,13 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: "mysql",
+    dialectModule: (await import('mysql2')).default,
     logging: false,
     port: process.env.DB_PORT,
     dialectOptions: {
       ssl: {
         rejectUnauthorized: true,
-        ca: fs.readFileSync(process.env.CA).toString()
+        ca: secret
       }
     }
   }

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance.js";
 import { MdEdit, MdDelete } from "react-icons/md";
-import { storeContext } from "../context/storeContext.jsx";
+import { storeContext } from "../context/StoreContext.jsx";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar.jsx";
@@ -300,7 +300,7 @@ const AdminProductPage = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex-shrink-0 h-10 w-10">
                             <img
-                              src={`http://127.0.0.1:8000/images/${product.Product_Images[0]?.image_path}`}
+                              src={`${product.Product_Images[0]?.image_path}`}
                               alt={product.name}
                               className="h-10 w-10 rounded-md object-contain"
                             />

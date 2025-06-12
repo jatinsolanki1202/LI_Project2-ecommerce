@@ -4,7 +4,7 @@ import axiosInstance from "../utils/axiosInstance";
 export const productContext = createContext(null)
 
 const ProductContextProvider = ({ children }) => {
-  const url = 'http://127.0.0.1:8000'
+
   const [products, setProducts] = useState([])
 
   const fetchProducts = async () => {

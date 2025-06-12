@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance.js";
-import { storeContext } from "../context/storeContext.jsx";
+import { storeContext } from "../context/StoreContext.jsx";
 import toast from "react-hot-toast";
 import Hero from "../components/Hero.jsx";
 import { CartContext } from "../context/CartContext.jsx";
 
 const Home = () => {
   const navigate = useNavigate();
-  const url = "http://127.0.0.1:8000";
+  const url = "https://ecommerce-project-1-rho.vercel.app";
   const [products, setProducts] = useState([]);
   const { token, fetchToken, deleteToken } = useContext(storeContext);
   const { fetchCart, cart, cartItems } = useContext(CartContext);
@@ -96,7 +96,7 @@ const Home = () => {
             >
               <div onClick={() => navigate(`/product/${product.id}`)} className="cursor-pointer">
                 <img
-                  src={`${url}/images/${product?.Product_Images[0]?.image_path}`}
+                  src={`${product?.Product_Images[0]?.image_path}`}
                   alt={product.name}
                   className="object-contain h-60 w-full"
                 />

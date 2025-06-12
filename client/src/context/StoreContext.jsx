@@ -4,7 +4,7 @@ import axiosInstance from "../utils/axiosInstance";
 export const storeContext = createContext(null)
 
 const ContextProvider = ({ children }) => {
-  const url = 'http://127.0.0.1:8000'
+  const url = 'https://ecommerce-project-1-rho.vercel.app'
   const [token, setToken] = useState(localStorage.getItem("token"))
 
   const fetchToken = () => {
