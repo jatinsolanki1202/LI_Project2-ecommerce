@@ -1,5 +1,3 @@
-import mysql from 'mysql2/promise'
-import fs from 'fs';
 import Sequelize from 'sequelize';
 import dotenv from "dotenv";
 dotenv.config();
@@ -28,7 +26,7 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     dialect: "mysql",
     logging: false,
-    port: process.env.DB_PORT,
+    port: Number(process.env.DB_PORT),
     dialectOptions: {
       ssl: {
         rejectUnauthorized: true,
