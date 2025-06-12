@@ -18,7 +18,7 @@ const ProductImage = sequelize.define('Product_Images', {
     type: DataTypes.STRING,
     allowNull: false
   }
-}, { timestamps: false });
+}, { timestamps: false, tableName: "product_images" });
 
 
 // Product.hasMany(ProductImage, { foreignKey: 'product_id', onDelete: 'CASCADE' })

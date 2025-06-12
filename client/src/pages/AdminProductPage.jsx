@@ -115,7 +115,7 @@ const AdminProductPage = () => {
       description: product?.description,
       price: product?.price,
       stock: product?.stock || 0,
-      category: product?.Category.name || "earphones",
+      category: product?.category.name || "earphones",
       images: null,
     });
   };
@@ -310,7 +310,7 @@ const AdminProductPage = () => {
                           <div className="text-sm font-medium text-gray-900">{product.name}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-500">{product.Category.name}</div>
+                          <div className="text-sm text-gray-500">{product.category.name}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">₹{product.price}</div>

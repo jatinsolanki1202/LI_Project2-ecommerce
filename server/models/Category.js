@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 
-const categoryModel = sequelize.define('Category', {
+const categoryModel = sequelize.define('category', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -20,7 +20,7 @@ const categoryModel = sequelize.define('Category', {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
   }
-}, { timestamps: false });
+}, { timestamps: false, tableName: 'categories' });
 
 
 export default categoryModel;

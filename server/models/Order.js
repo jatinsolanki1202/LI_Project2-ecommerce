@@ -37,7 +37,7 @@ const Order = sequelize.define(
     },
     
   },
-  { timestamps: false }
+  { timestamps: false, tableName: "orders" }
 );
 
 Order.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" });

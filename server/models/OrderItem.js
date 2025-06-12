@@ -34,7 +34,7 @@ const OrderItem = sequelize.define(
       allowNull: false,
     },
   },
-  { timestamps: false }
+  { timestamps: false,  tableName: "orderitems" }
 );
 
 // Define relationships
