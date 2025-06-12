@@ -16,9 +16,9 @@ dotenv.config();
 // })
 
 
-let secret = `-----BEGIN CERTIFICATE-----\n`
-secret += process.env.SQL_SECRET_KEY.toString()
-secret += `\n-----END CERTIFICATE-----`
+// let secret = `-----BEGIN CERTIFICATE-----\n`
+// secret += process.env.SQL_SECRET_KEY.toString()
+// secret += `\n-----END CERTIFICATE-----`
 
 const sequelize = new Sequelize(
   process.env.DB_DATABASE,
@@ -33,7 +33,7 @@ const sequelize = new Sequelize(
     dialectOptions: {
       ssl: {
         rejectUnauthorized: true,
-        ca: secret
+        ca: fs.readFileSync(process.env.CA).toString()
       }
     }
   }
