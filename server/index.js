@@ -20,7 +20,7 @@ syncDatabase()
 const app = express()
 dotenv.config()
 
-const allowedOrigins = ['https://ecommerce-project-1-client.vercel.app'];
+const allowedOrigins = ['https://ecommerce-project-1-client.vercel.app', 'http://localhost:5173'];
 
 app.use(cors({
   origin: function (origin, callback) {
