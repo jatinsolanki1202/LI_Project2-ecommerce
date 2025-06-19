@@ -178,7 +178,7 @@ const fetchCategory = async (req, res) => {
       include: [
         {
           model: Product,
-          where: { is_active: '1' }
+          // where: { is_active: '1' }
         }
       ]
     })

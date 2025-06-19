@@ -120,7 +120,6 @@ const AdminPanel = () => {
       },
     ],
   }
-  console.log(products, "llllx");
 
   const productOptions = {
     responsive: true,
