@@ -301,9 +301,9 @@ const handleCheckOut = async (req, res) => {
 
     let totalAmount = 0;
 
-    // total amount calculation
+    // total amount calculation    
     cart?.CartItems.forEach((item) => {
-      totalAmount += item.quantity * item.Product.price;
+      totalAmount += item.quantity * Number(item.Product.price);      
     });
 
 
@@ -314,7 +314,7 @@ const handleCheckOut = async (req, res) => {
     });
 
     const razorpayRes = await RazorpayInstance.orders.create({
-      amount: totalAmount * 100,
+      amount:  Math.round(Number(totalAmount) * 100),
       currency: "INR",
       notes: {
         key1: "try k 1",
@@ -405,8 +405,6 @@ const handleCodOrderPlacing = async(req, res) => {
         },
       ],
     });
-
-    console.log(JSON.stringify(cart, null, 2), " checkoutApi");
 
     if (cart.CartItems.length < 1) {
       return res.json({

@@ -4,36 +4,32 @@ import { storeContext } from "../context/StoreContext.jsx";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-hot-toast";
 import { CartContext } from "../context/CartContext.jsx";
+import { BsPlusCircle, BsDashCircle } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const { token, fetchToken, deleteToken } = useContext(storeContext);
-  const { fetchCart, cart } = useContext(CartContext)
+  const { fetchCart, cart } = useContext(CartContext);
   const [cartItems, setCartItems] = useState([]);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const fetchCartItems = async () => {
     if (!token) {
       setIsLoading(false);
       return;
     }
-
     try {
       setIsLoading(true);
-      const response = await axiosInstance.get("/user/cart", {
-        headers: { token },
-      });
-
-      const cartData = response.data.cart?.CartItems || [];
-      setCartItems(cartData);
-      calculateTotal(cartData);
-    } catch (error) {
-      console.error("Error fetching cart items:", error);
+      const { data } = await axiosInstance.get("/user/cart", { headers: { token } });
+      const items = data.cart?.CartItems || [];
+      setCartItems(items);
+      calculateTotal(items);
+    } catch {
       toast.error("Failed to fetch cart items");
     } finally {
       setIsLoading(false);
@@ -41,175 +37,177 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    fetchToken()
+    fetchToken();
+  }, []);
+
+  useEffect(() => {
     fetchCartItems();
   }, [token]);
 
   useEffect(() => {
-    fetchCart()
-  }, [])
+    fetchCart();
+  }, []);
 
-  const calculateTotal = (items) => {
-    let totalQty = 0;
-    let totalAmt = 0;
-    items.forEach((item) => {
-      totalQty += item.quantity;
-      totalAmt += item.quantity * item.Product.price;
+  const calculateTotal = items => {
+    let qty = 0, amt = 0;
+    items.forEach(item => {
+      qty += item.quantity;
+      amt += item.quantity * item.Product.price;
     });
-    setTotalQuantity(totalQty);
-    setTotalAmount(totalAmt);
+    setTotalQuantity(qty);
+    setTotalAmount(amt);
   };
 
-  const confirmRemoveFromCart = (productId) => {
+  // const changeQuantity = async (productId, newQty) => {
+  //   if (newQty < 1) return;
+  //   try {
+  //     const resp = await axiosInstance.put("/cart/update", {
+  //       cart_id: cart.id, product_id: productId, quantity: newQty
+  //     }, { headers: { token } });
+
+  //     if (resp.data.success) {
+  //       fetchCartItems();
+  //       fetchCart();
+  //     } else {
+  //       toast.error(resp.data.message);
+  //     }
+  //   } catch {
+  //     toast.error("Could not update quantity");
+  //   }
+  // };
+
+  const changeQuantity = async (productId, newQty) => {
+  if (newQty < 1) return;
+
+  // Optimistic UI update (local state update before API)
+  const updatedItems = cartItems.map(item =>
+    item.product_id === productId ? { ...item, quantity: newQty } : item
+  );
+  setCartItems(updatedItems);
+  calculateTotal(updatedItems);
+
+  try {
+    const resp = await axiosInstance.put("/cart/update", {
+      cart_id: cart.id,
+      product_id: productId,
+      quantity: newQty,
+    }, { headers: { token } });
+
+    if (!resp.data.success) {
+      toast.error(resp.data.message);
+      // Revert if API fails
+      fetchCartItems();
+    }
+  } catch (error) {
+    toast.error("Could not update quantity");
+    fetchCartItems(); // fallback to accurate state
+  }
+};
+
+
+  const confirmRemove = productId => {
     setSelectedProductId(productId);
     setShowModal(true);
   };
 
   const removeFromCart = async () => {
     try {
-
-      const response = await axiosInstance.delete(`/cart/remove/${selectedProductId}?cartid=${cart.id}`, {
-        headers: { token },
-      });
-
-      if (response.data.message === "session timed out. Please login again") {
-        localStorage.removeItem("token");
-        toast.error(response.data.message);
+      const resp = await axiosInstance.delete(`/cart/remove/${selectedProductId}?cartid=${cart.id}`, { headers: { token } });
+      if (resp.data.success) {
+        toast.success(resp.data.message);
         fetchCartItems();
-        fetchCart()
-      } else if (response.data.success) {
-        toast.success(response.data.message);
-        fetchCartItems();
-        fetchCart()
+        fetchCart();
       } else {
-        toast.error(response.data.message);
+        toast.error(resp.data.message);
       }
-    } catch (error) {
-      console.error("Error removing item from cart:", error);
-      toast.error("Failed to remove item from cart");
+    } catch {
+      toast.error("Failed to remove item");
     } finally {
       setShowModal(false);
-      setSelectedProductId(null);
     }
   };
 
   const handleCheckout = async () => {
     try {
-      const response = await axiosInstance.post("/user/checkout", {}, {
-        headers: { token }
-      });
-      if (response.data.message == "session timed out. Please login again") {
-        localStorage.removeItem("token");
-        deleteToken();
-        fetchCart();
-        toast.error(response.data.message);
-        return;
-      } else if (response.data.success) {
-        // toast.success("Order created successfully!");
-        navigate("/razorpay-checkout-page", { state: { response: response.data } })
+      const resp = await axiosInstance.post("/user/checkout", {}, { headers: { token } });
+      if (resp.data.success) {
+        navigate("/razorpay-checkout-page", { state: { response: resp.data } });
         fetchCartItems();
-        fetchCart()
+        fetchCart();
       } else {
-        toast.error(response.data.message || "Checkout failed");
-        fetchCart()
+        toast.error(resp.data.message);
       }
-    } catch (error) {
-      console.error("Error during checkout:", error);
-      toast.error("Checkout failed. Please try again.");
+    } catch {
+      toast.error("Checkout failed");
     }
   };
 
   if (isLoading) {
     return (
-      <div className="p-5 min-h-screen text-white flex items-center justify-center">
-        <div className="text-xl">Loading cart...</div>
+      <div className="min-h-screen flex items-center justify-center text-xl text-gray-700">
+        Loading cart...
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <h1 className="text-3xl font-bold mb-5">Shopping Cart</h1>
-      <hr className="h-[1px] w-full border-0 bg-zinc-500" />
-      <div className="p-5 min-h-screen text-black flex flex-col items-center w-full">
-        {!token ? (
-          <p className="text-lg">Please log in to view your cart</p>
-        ) : cartItems.length === 0 ? (
-          <p className="text-lg">Your cart is empty</p>
-        ) : (
-          <div className="space-y-4 w-full">
-            {cartItems.map((item) => (
-              <div
-                key={item.product_id}
-                className="flex items-center justify-between gap-2 bg-gray-200 text-gray-900 p-4 shadow-md rounded-lg"
-              >
-                <img
-                  src={`${item.Product.Product_Images[0]?.image_path}`}
-                  alt={item.Product.name}
-                  className="h-16 w-16 object-contain rounded"
-                />
-                <div className="flex-1 ml-4">
-                  <h3 className="text-lg font-semibold">{item.Product.name}</h3>
-                  <p className="text-sm text-gray-700">
-                    ₹{item.Product.price} x {item.quantity}
-                  </p>
+    <div className="min-h-screen p-4 md:p-8 bg-gray-100">
+      <h1 className="text-3xl font-bold mb-6 text-center">Your Shopping Cart</h1>
+
+      {!token ? (
+        <p className="text-center text-lg">Please log in to view your cart.</p>
+      ) : cartItems.length === 0 ? (
+        <p className="text-center text-lg">Your cart is empty.</p>
+      ) : (
+        <>
+          <div className="space-y-4 mb-8">
+            {cartItems.map(item => (
+              <div key={item.product_id} className="flex flex-col md:flex-row items-center justify-between bg-white p-4 rounded-lg shadow-md space-y-4 md:space-y-0">
+                <div className="flex items-center space-x-4 w-full md:w-2/3">
+                  <img src={item.Product.Product_Images[0]?.image_path} alt={item.Product.name} className="h-20 w-20 object-contain rounded-md" />
+                  <div className="flex-1">
+                    <h2 className="text-lg font-semibold">{item.Product.name}</h2>
+                    <p className="text-gray-600">₹{Number(item.Product.price).toFixed(2)} each</p>
+                  </div>
                 </div>
-                <p className="text-lg font-bold">
-                  ₹{item.Product.price * item.quantity}
-                </p>
-                <button
-                  onClick={() => confirmRemoveFromCart(item.product_id)}
-                  className="bg-red-500 hover:bg-red-700 cursor-pointer rounded-full text-white px-3 py-3"
-                >
-                  <MdDelete />
-                </button>
+
+                <div className="flex items-center space-x-4">
+                  <button onClick={() => changeQuantity(item.product_id, item.quantity - 1)} className="text-gray-500 hover:text-gray-800"><BsDashCircle size={24} /></button>
+                  <span className="text-lg">{item.quantity}</span>
+                  <button onClick={() => changeQuantity(item.product_id, item.quantity + 1)} className="text-gray-500 hover:text-gray-800"><BsPlusCircle size={24} /></button>
+                </div>
+
+                <p className="font-semibold text-lg">₹{(Number(item.Product.price) * item.quantity).toFixed(2)}</p>
+
+                <button onClick={() => confirmRemove(item.product_id)} className="text-red-600 hover:text-red-800"><MdDelete size={24} /></button>
               </div>
             ))}
-            <div className="p-4 bg-gray-800 text-white rounded-lg mt-5">
-              <h2 className="text-xl font-bold">Cart Summary</h2>
-              <p className="mt-2">
-                Total Items: <span className="font-semibold">{totalQuantity}</span>
-              </p>
-              <p className="mt-1 text-lg">
-                Total Amount:{" "}
-                <span className="font-bold text-green-400">₹{totalAmount}</span>
-              </p>
-              <button
-                onClick={handleCheckout}
-                className="w-full bg-green-500 hover:bg-green-600 text-white text-lg font-semibold py-2 mt-4 rounded-lg"
-              >
-                Checkout
-              </button>
-            </div>
           </div>
-        )}
 
-        {/* Confirmation Modal */}
-        {showModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">
-                Confirm Deletion
-              </h2>
-              <p className="text-gray-700">Are you sure you want to remove this item from your cart?</p>
-              <div className="mt-5 flex justify-center gap-4">
-                <button
-                  onClick={removeFromCart}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
-                >
-                  Yes, Remove
-                </button>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg"
-                >
-                  Cancel
-                </button>
-              </div>
+          <div className="sticky bottom-0 bg-white p-4 border-t md:flex md:justify-between md:items-center">
+            <div className="mb-4 md:mb-0">
+              <p>Total Items: <span className="font-semibold">{totalQuantity}</span></p>
+              <p>Total Amount: <span className="font-bold text-green-600">₹{totalAmount.toFixed(2)}</span></p>
+            </div>
+            <button onClick={handleCheckout} className="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-lg">
+              Checkout
+            </button>
+          </div>
+        </>
+      )}
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 w-80 text-center shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Confirm Removal</h2>
+            <p className="text-gray-700 mb-6">Remove this item from your cart?</p>
+            <div className="flex justify-center space-x-4">
+              <button onClick={removeFromCart} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">Yes</button>
+              <button onClick={() => setShowModal(false)} className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg">Cancel</button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

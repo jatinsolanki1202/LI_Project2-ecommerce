@@ -818,7 +818,7 @@ const RazorCheckoutPage = () => {
           headers: { token }
         })
       }
-      
+
       const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
       if (!res) {
         toast.error('Razorpay SDK failed to load');
@@ -1214,7 +1214,7 @@ const RazorCheckoutPage = () => {
                 <div className="space-y-2 pt-4">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span>₹{cart?.CartItems?.reduce((acc, item) => acc + (item.Product?.price * item.quantity), 0) || 0}</span>
+                    <span>₹{cart?.CartItems?.reduce((acc, item) => acc + (item.Product?.price * item.quantity), 0).toFixed(2) || 0}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Tax (GST)</span>

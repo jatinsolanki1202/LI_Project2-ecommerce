@@ -54,4 +54,31 @@ const fetchCartItems = async (req, res) => {
     res.json({ success: false, message: err.message })
   }
 }
-export { removeItem, fetchCartItems }
+
+const updateCartItem = async (req, res) => {
+  try {
+    const { cart_id, product_id, quantity } = req.body;
+    const userId = req.user.id;
+
+    if (!cart_id || !product_id || !quantity) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    let cartItem = await CartItem.findOne({
+      where: { cart_id, product_id }
+    });
+
+    if (!cartItem) {
+      return res.status(404).json({ success: false, message: "Cart item not found" });
+    }
+
+    cartItem.quantity = quantity;
+    await cartItem.save();
+
+    return res.json({ success: true, message: "Cart item updated successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+}
+export { removeItem, fetchCartItems, updateCartItem }
