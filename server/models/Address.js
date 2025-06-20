@@ -19,10 +19,7 @@ const Address = sequelize.define(
     phone:{
       type: DataTypes.STRING,
     },
-    first_name:{
-      type: DataTypes.STRING,
-    },
-    last_name:{
+    full_name: {
       type: DataTypes.STRING,
     },
     address1: {

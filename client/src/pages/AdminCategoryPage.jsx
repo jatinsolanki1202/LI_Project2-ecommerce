@@ -24,7 +24,6 @@ const AdminCategoryPage = () => {
       const response = await axiosInstance.get('/admin/category', {
         headers: { token: localStorage.getItem("token") }
       });
-      console.log(response.data, " ppoo");
 
       setCategories(response.data.data);
     } catch (error) {

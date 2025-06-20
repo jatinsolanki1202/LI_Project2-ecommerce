@@ -12,57 +12,91 @@ import CartItem from "../models/CartItem.js";
 import { where } from "sequelize";
 import Razorpay from "razorpay";
 import Address from "../models/Address.js";
+import sequelize from "../config/db.js";
 
 const createUser = async (req, res) => {
   try {
-    //validation check
+    // 1. validation check
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.json({ message: errors.array()[0].msg });
+      return res.json({ message: errors.array()[0].msg, status: 400 });
     }
-    let { name, email, password, cnfPassword, address } = req.body;
 
-    let existingUser = await User.findOne({
-      where: { email },
-    });
-    if (existingUser)
+    const {
+      name, email, password, cnfPassword,
+      phone, address1, address2, zip,
+      country, state, city
+    } = req.body;
+
+    // 2. Check for existing user
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
       return res.json({
         data: null,
-        message: "email already registered",
+        message: "Email already registered",
         status: 400,
       });
-    if (password != cnfPassword)
+    }
+
+    if (password !== cnfPassword) {
       return res.json({
         data: null,
-        message: "password and confirm password did not match",
+        message: "Password and confirm password do not match",
         status: 400,
       });
+    }
 
-    // password hashing
-    let hashedPassword = await hashPassword(password);
+    const hashedPassword = await hashPassword(password);
 
-    // user creation
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      address,
+    // 3. Create user and address within transaction
+    let newUser;
+
+    await sequelize.transaction(async (t) => {
+      // Create user first
+      const user = await User.create({
+        name,
+        email,
+        password: hashedPassword,
+      }, { transaction: t });
+
+      if (!user) throw new Error("User creation failed");
+
+      // Then create address
+      const address = await Address.create({
+        user_id: user.id,
+        address1,
+        address2,
+        zip,
+        phone,
+        email,
+        full_name: name,  
+        country,
+        state,
+        city,
+      }, { transaction: t });
+
+      if (!address) throw new Error("Address creation failed");
+
+      // Assign to outer variable for token generation
+      newUser = user;
     });
-    if (!user)
-      return res.json({ message: "error registering user", status: 500 });
 
-    // token creation
-    const token = createToken(user.id, user.role);
+    // 4. Create token outside the transaction
+    const token = createToken(newUser.id, newUser.role);
+
+    // 5. Final response
     return res.json({
-      data: user,
-      message: "user registered successfully",
-      status: 301,
+      data: newUser,
+      message: "User registered successfully",
+      status: 201,
       token,
     });
+
   } catch (err) {
     return res.json({ message: err.message, status: 500 });
   }
 };
+
 
 const handleLogin = async (req, res) => {
   try {

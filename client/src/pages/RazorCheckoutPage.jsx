@@ -6,55 +6,71 @@ import { useContext } from 'react';
 import { storeContext } from '../context/StoreContext.jsx';
 import { loadScript } from '../utils/scriptLoader';
 import { CartContext } from '../context/CartContext.jsx';
+import validator from 'validator';
 
 
 const RazorCheckoutPage = () => {
   const { token } = useContext(storeContext);
   const { cart, fetchCart } = useContext(CartContext);
   const location = useLocation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(1);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState({});
   const [address, setAddress] = useState({
-    email: '',
     phone: '',
-    firstName: '',
-    lastName: '',
-    street: '',
-    apartment: '',
+    full_name: '',
+    address1: '',
+    address2: '',
     city: '',
     state: '',
     zip: '',
-    country: ''
+    country: '',
+    email: ''
   });
   const [paymentMethod, setPaymentMethod] = useState('');
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+  
+  const [email, setEmail] = useState('');
+  useEffect(() => {
+    fetchAddresses()
+    fetchCart();
+  }, []);
 
   useEffect(() => {
-    fetchCart()
-  }, [])
+  if (addresses.length > 0 && addresses[0]?.email) {
+    console.log(addresses[0].email);
+    
+    setEmail(addresses[0].email);
+  }
+}, [addresses]);
 
-  useEffect(() => {
-    const fetchAddresses = async () => {
-      try {
-        const response = await axiosInstance.get('/user/addresses', {
-          headers: { token: token }
-        });
-        if (response.data.success) {
-          setAddresses(response?.data.data);
-        }
-        if (response.data.data?.length === 0) {
-          toast.error("No addresses found");
-        }
-      } catch (error) {
-        console.error('Error fetching addresses:', error);
-        toast.error('Failed to fetch addresses');
+  const fetchAddresses = async () => {
+    try {
+      const response = await axiosInstance.get('/user/addresses', {
+        headers: { token: token }
+      });
+      if (response.data.success) {
+        setAddresses(response?.data.data);
       }
-    };
+      if (response.data.data?.length === 0) {
+        toast.error("No addresses found");
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+      toast.error('Failed to fetch addresses');
+    }
+  };
+  useEffect(() => {
     fetchAddresses();
+    // fetchEmail()
   }, [token]);
 
+  // const fetchEmail = async () => {
+  //   const response = await fetchAddresses()
+  //   console.log(response, " ///////////");
+    
+  // }
   const handleAddressChange = (e) => {
     setAddress({
       ...address,
@@ -71,8 +87,7 @@ const RazorCheckoutPage = () => {
       setAddress({
         email: selectedAddr.email || '',
         phone: selectedAddr.phone || '',
-        firstName: selectedAddr.first_name || '',
-        lastName: selectedAddr.last_name || '',
+        full_name: selectedAddr.full_name || '',
         address1: selectedAddr.address1 || '',
         address2: selectedAddr.address2 || '',
         city: selectedAddr.city || '',
@@ -84,8 +99,7 @@ const RazorCheckoutPage = () => {
       setAddress({
         email: '',
         phone: '',
-        firstName: '',
-        lastName: '',
+        full_name: '',
         address1: '',
         address2: '',
         city: '',
@@ -97,8 +111,13 @@ const RazorCheckoutPage = () => {
   };
 
   const isAddressValid = () => {
-    const requiredFields = ['email', 'phone', 'firstName', 'lastName', 'street', 'city', 'state', 'zip', 'country'];
-    return requiredFields.every(field => address[field]?.trim() !== '');
+    const { full_name, email, phone, address1, city, state, zip, country } = address;
+    if (!full_name || !email || !phone || !address1 || !city || !state || !zip || !country) {
+      return false;
+    }
+    if (!validator.isEmail(email)) return false;
+    if (!/^[0-9]{10}$/.test(phone)) return false;
+    return true;
   };
 
   const handlePaymentSelection = (method) => {
@@ -120,10 +139,8 @@ const RazorCheckoutPage = () => {
         name: "Shopfinity",
         description: "Payment for your order",
         order_id: location.state.response.data.id,
-        // callback_url: "https://fitting-seagull-oddly.ngrok-free.app/razorpay/get-razorpay-res",
         handler: async function (response) {
           try {
-            // Verify payment on backend
             const verificationResponse = await axiosInstance.post("/razorpay/get-razorpay-res", { ...response, cartId: cart.id, productId: cart.CartItems.Product }, {
               headers: { token }
             });
@@ -131,7 +148,6 @@ const RazorCheckoutPage = () => {
             if (verificationResponse.data.success) {
               toast.success("Payment successful! Order placed");
               setIsOrderPlaced(true);
-              // Clear cart and redirect to home
               fetchCart();
               navigate('/', { replace: true });
             } else {
@@ -143,7 +159,7 @@ const RazorCheckoutPage = () => {
           }
         },
         prefill: {
-          name: `${address.firstName} ${address.lastName}`,
+          name: `${address.full_name}`,
           email: address.email,
           contact: address.phone
         },
@@ -160,26 +176,8 @@ const RazorCheckoutPage = () => {
     }
   };
 
-  const handlePaymentSuccess = async (response) => {
-    try {
-      console.log(response);
-
-      // Add your payment verification API call here
-      const response2 = await axiosInstance.post("/razorpay/get-razorpay-res", response)
-      if (response2.data.success) {
-        setIsOrderPlaced(true);
-        toast.success("Payment successfull. Order placed")
-      }
-
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error('Payment verification failed');
-    }
-  };
-
   const handleCashOnDelivery = async () => {
     try {
-      // Add your COD order creation API call here
       setIsOrderPlaced(true);
     } catch (error) {
       console.error('Error:', error);
@@ -190,14 +188,14 @@ const RazorCheckoutPage = () => {
   const handleContinue = () => {
     if (activeStep === 1) {
       if (!isAddressValid()) {
-        toast.error("Please fill all required fields");
+        toast.error("Please fill all fields correctly");
         return;
       }
       setActiveStep(2);
     }
   };
 
-  console.log(cart, " ooll");
+
 
   return (
     <div className="min-h-screen py-8 flex justify-center items-center">
@@ -232,15 +230,25 @@ const RazorCheckoutPage = () => {
                     </select>
                   </div>
 
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Full Name"
+                    className="w-full px-4 py-3 border rounded-md focus:ring-blue-500"
+                    value={address.full_name}
+                    onChange={handleAddressChange}
+                  />
+
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <input
                         type="email"
                         name="email"
                         placeholder="Email address"
-                        className="w-full px-4 py-3 border rounded-md focus:ring-blue-500"
+                        className="w-full px-4 py-3 border rounded-md focus:ring-blue-500 text-gray-500"
                         value={address.email}
                         onChange={handleAddressChange}
+                        disabled
                       />
                       <input
                         type="tel"
@@ -248,25 +256,6 @@ const RazorCheckoutPage = () => {
                         placeholder="Phone number"
                         className="w-full px-4 py-3 border rounded-md focus:ring-blue-500"
                         value={address.phone}
-                        onChange={handleAddressChange}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <input
-                        type="text"
-                        name="firstName"
-                        placeholder="First name"
-                        className="w-full px-4 py-3 border rounded-md focus:ring-blue-500"
-                        value={address.firstName}
-                        onChange={handleAddressChange}
-                      />
-                      <input
-                        type="text"
-                        name="lastName"
-                        placeholder="Last name"
-                        className="w-full px-4 py-3 border rounded-md focus:ring-blue-500"
-                        value={address.lastName}
                         onChange={handleAddressChange}
                       />
                     </div>
