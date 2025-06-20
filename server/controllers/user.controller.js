@@ -69,7 +69,7 @@ const createUser = async (req, res) => {
         zip,
         phone,
         email,
-        full_name: name,  
+        full_name: name,
         country,
         state,
         city,
@@ -335,7 +335,7 @@ const handleCheckOut = async (req, res) => {
       user_id: userId,
       total_amount: totalAmount,
       status: "pending",
-      razorpay_order_id: razorpayRes.id
+      razorpay_order_id: razorpayRes?.id || null
     });
 
     const orderItems = cart.CartItems.map((item) => ({
@@ -392,6 +392,108 @@ const getAddresses = async (req, res) => {
   }
 }
 
+const handleCodOrderPlacing = async(req, res) => {
+   try {
+    const userId = req.user.id;
+
+    const cart = await Cart.findOne({
+      where: { user_id: userId },
+      include: [
+        {
+          model: CartItem,
+          include: [{ model: Product }],
+        },
+      ],
+    });
+
+    console.log(JSON.stringify(cart, null, 2), " checkoutApi");
+
+    if (cart.CartItems.length < 1) {
+      return res.json({
+        success: false,
+        message: "Cart is empty",
+        status: 400,
+      });
+    }
+
+    let totalAmount = 0;
+
+    // total amount calculation
+    cart?.CartItems.forEach((item) => {
+      totalAmount += item.quantity * item.Product.price;
+    });
+
+
+    const order = await Order.create({
+      user_id: userId,
+      total_amount: totalAmount,
+      status: "pending",
+    });
+
+    const orderItems = cart.CartItems.map((item) => ({
+      order_id: order.id,
+      product_id: item.product_id,
+      product_name: item.Product.name,
+      quantity: item.quantity,
+      price: item.Product.price,
+    }));
+
+    await OrderItem.bulkCreate(orderItems);
+
+
+    // delete cart
+      await Cart.destroy({ where: { user_id: userId } });
+
+      // Decrement stock for all purchased products
+      await Promise.all(
+        orderItems.map(async (item) => {
+          await Product.decrement("stock", {
+            by: item.quantity,
+            where: { id: item.product_id },
+          });
+        })
+      );
+
+    return res.json({
+      success: true,
+      message: "Order created successfully",
+    });
+  } catch (error) {
+    console.error("Checkout error:", error);
+    res.json({ success: false, message: "Checkout failed", status: 500 });
+  }
+}
+
+const handleAddAddress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { full_name, address1, address2, zip, phone, country, state, city } = req.body;
+ console.log(req.body, " bodyy");
+ 
+    // Validate required fields
+    if (!full_name || !address1 || !zip || !phone || !country || !state || !city) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    // Create new address
+    const newAddress = await Address.create({
+      user_id: userId,
+      full_name,
+      address1,
+      address2,
+      zip,
+      phone,
+      country,
+      state,
+      city,
+    });
+
+    res.status(201).json({ success: true, data: newAddress, message: "Address added successfully" });
+  } catch (error) {
+    console.error("Error adding address:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
 export {
   createUser,
   handleLogin,
@@ -400,5 +502,7 @@ export {
   addToCart,
   listCart,
   handleCheckOut,
-  getAddresses
+  getAddresses,
+  handleCodOrderPlacing,
+  handleAddAddress
 };

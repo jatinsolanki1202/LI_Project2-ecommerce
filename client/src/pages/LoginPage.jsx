@@ -209,18 +209,22 @@ const LoginPage = () => {
             </>
           )}
 
-          <button type="submit" className={`w-full bg-black text-white py-2 rounded transition font-semibold ${!isEmpty(formErrors) ? 'cursor-not-allowed bg-gray-500 hover:bg-gray-500' : 'cursor-pointer bg-black hover:bg-gray-800'}`} disabled={formErrors}>
-          {isRegister ? "Register" : "Login"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            className={`w-full bg-black text-white py-2 rounded transition font-semibold ${Object.values(formErrors).some(err => err) ? 'cursor-not-allowed bg-gray-500 hover:bg-gray-500' : 'cursor-pointer bg-black hover:bg-gray-800'}`}
+            disabled={Object.values(formErrors).some(err => err)}
+          >
+            {isRegister ? "Register" : "Login"}
+          </button>
+        </form>
 
-      <p className="text-center mt-4 text-gray-600">
-        {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
-        <button onClick={() => setIsRegister(!isRegister)} className="text-black font-semibold hover:underline">
-          {isRegister ? "Login" : "Register"}
-        </button>
-      </p>
-    </div>
+        <p className="text-center mt-4 text-gray-600">
+          {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
+          <button onClick={() => setIsRegister(!isRegister)} className="text-black font-semibold hover:underline">
+            {isRegister ? "Login" : "Register"}
+          </button>
+        </p>
+      </div>
     </div >
   );
 };
