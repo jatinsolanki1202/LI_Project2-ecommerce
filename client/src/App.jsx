@@ -17,6 +17,7 @@ import ProductDetails from './pages/ProductDetails.jsx'
 import Footer from './components/Footer.jsx'
 import RazorCheckoutPage from './pages/RazorCheckoutPage.jsx'
 import AdminCategoryPage from './pages/AdminCategoryPage.jsx'
+import Orders from './pages/Orders.jsx'
 
 function App() {
 
@@ -38,6 +39,7 @@ function App() {
           <Route path='/about' element={<About />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/product/:id' element={<ProductDetails />} />
+          <Route path='/orders' element={<Orders />} />
           <Route path='/razorpay-checkout-page' element={<RazorCheckoutPage />} />
         </Routes>
       </div>

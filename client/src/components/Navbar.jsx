@@ -36,9 +36,6 @@ const Navbar = () => {
         setUserRole(response.data.user?.role);
       }
 
-      if (response.data.user?.role == "admin") {
-        setIsAdmin(true)
-      }
     } catch (error) {
       setIsLoggedIn(false);
       setUserRole("");
@@ -46,6 +43,29 @@ const Navbar = () => {
     }
   };
 
+  const checkIsAdmin = async () => {
+    try {
+      if (!token) {
+        setIsAdmin(true);
+        return;
+      }
+
+      const response = await axiosInstance.get("/check/is-admin", {
+        headers: {
+          token
+        }
+      });
+
+      if (response.data?.isAdmin) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    } catch (error) {
+      console.error("Error checking admin status:", error.message);
+      setIsAdmin(false);
+    }
+  }
   const checkLoginStatus = async () => {
     try {
       let response = await axiosInstance.get('/check/login-status', {
@@ -67,6 +87,7 @@ const Navbar = () => {
   useEffect(() => {
     // fetchCart()
     checkLogin()
+    checkIsAdmin()
   }, [])
 
   useEffect(() => {
@@ -79,6 +100,7 @@ const Navbar = () => {
       setToken(null);
       localStorage.removeItem("token");
       setIsLoggedIn(false);
+      setIsAdmin(true)
       fetchCart()
       navigate("/");
       toast.success("Logged out successfully")
@@ -103,17 +125,19 @@ const Navbar = () => {
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
         <NavLink to="/about" className="flex flex-col items-center gap-1 px-3 py-2  rounded-lg hover:text-gray-700 hover:rounded-lg hover:bg-gray-100 transition duration-400">
-          <p>About</p>
+          <p>About Us</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
         <NavLink to="/contact" className="flex flex-col items-center gap-1 px-3 py-2  rounded-lg hover:text-gray-700 hover:rounded-lg hover:bg-gray-100 transition duration-400">
-          <p>Contact</p>
+          <p>Contact Us</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink onClick={checkLoginStatus} className="flex flex-col items-center justify-center gap-1 px-3 py-1  rounded-4xl hover:text-gray-700 hover:rounded-4xl hover:bg-gray-100 transition duration-400 border-2">
-          <p>Admin</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
-        </NavLink>
+        {isAdmin && (
+          <NavLink onClick={checkLoginStatus} className="flex flex-col items-center justify-center gap-1 px-3 py-1  rounded-4xl hover:text-gray-700 hover:rounded-4xl hover:bg-gray-100 transition duration-400 border-2">
+            <p>Admin</p>
+            <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+          </NavLink>
+        )}
       </ul>
 
       <ul>
@@ -137,7 +161,7 @@ const Navbar = () => {
                 {isLoggedIn ? (
                   <>
                     <p className="cursor-pointer hover:text-black" onClick={() => navigate('/cart')}>Cart</p>
-                    <p className="cursor-pointer hover:text-black">Orders</p>
+                    <p className="cursor-pointer hover:text-black" onClick={() => navigate('/orders')}>Orders</p>
                     <p className="cursor-pointer hover:text-black" onClick={handleLogout}>
                       Logout
                     </p>
@@ -184,14 +208,16 @@ const Navbar = () => {
                 Collection
               </NavLink>
               <NavLink className="py-2 pl-6 border border-gray-200" onClick={() => setVisible(false)} to="/about">
-                About
+                About Us
               </NavLink>
               <NavLink className="py-2 pl-6 border border-gray-200" onClick={() => setVisible(false)} to="/contact">
-                Contact
+                Contact Us
               </NavLink>
-              <NavLink className="py-2 pl-6 border border-gray-200" onClick={() => setVisible(false)} to="/admin">
-                Admin
-              </NavLink>
+              {isAdmin && (
+                <NavLink className="py-2 pl-6 border border-gray-200" onClick={() => setVisible(false)} to="/admin">
+                  Admin
+                </NavLink>
+              )}
             </div>
           </div>
         </div>

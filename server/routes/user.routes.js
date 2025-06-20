@@ -1,5 +1,5 @@
 import express from 'express'
-import { createUser, handleLogin, homePage, logoutUser, addToCart, listCart, handleCheckOut, getAddresses, handleCodOrderPlacing, handleAddAddress } from '../controllers/user.controller.js'
+import { createUser, handleLogin, homePage, logoutUser, addToCart, listCart, handleCheckOut, getAddresses, handleCodOrderPlacing, handleAddAddress, getAllOrders } from '../controllers/user.controller.js'
 import { body } from 'express-validator'
 import loginAuth from '../middlewares/loginAuth.js'
 
@@ -37,6 +37,7 @@ router.post('/cart/add', loginAuth, addToCart)
 router.post('/checkout', loginAuth, handleCheckOut)
 router.post('/place-cod-order', loginAuth, handleCodOrderPlacing)
 router.post('/add-address', loginAuth, handleAddAddress)
+router.get('/orders', loginAuth, getAllOrders)
 
 router.post('/logout', logoutUser)
 export default router

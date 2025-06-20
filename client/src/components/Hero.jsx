@@ -1,5 +1,6 @@
 import React from 'react'
 import heroImg from '../assets/images/iqoo13HeroImg3.jpg'
+import { Link } from 'react-router-dom'
 
 const Hero = () => {
   return (
@@ -14,7 +15,7 @@ const Hero = () => {
 
           <h1 className='text-3xl sm:py-3 lg:text-5xl leading-relaxed uppercase'>Latest Arrivals</h1>
           <div className='flex gap-2 items-center'>
-            <p className='font-semibold text-sm md:text-base uppercase'>Shop Now</p>
+            <Link to={'/product/150002'} className='font-semibold text-sm md:text-base uppercase'>Shop Now</Link>
             <p className='w-8 md:w-11 h-[2px] bg-[#414141]'></p>
           </div>
         </div>
