@@ -3,9 +3,11 @@ import axiosInstance from "../utils/axiosInstance.js";
 import { storeContext } from "../context/StoreContext.jsx";
 import toast from "react-hot-toast";
 import { CartContext } from "../context/CartContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 const Products = () => {
   const url = "https://ecommerce-project-1-rho.vercel.app";
+  const navigate = useNavigate()
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState(new Set());
@@ -202,55 +204,36 @@ const Products = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-4 md:p-6"> {/* Added flex-1 and margin-left for sidebar */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Products</h1>
-          <p className="text-gray-600">
-            {filteredProducts.length} products found
-            {selectedCategories.size > 0 && ' in selected categories'}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
-          {filteredProducts.map((product) => (
+      <div className="container mx-auto px-4 py-10">
+        <h2 className="text-3xl font-semibold mb-6">Featured Products</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          {products.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+              className="bg-white shadow-md rounded-lg p-5 overflow-hidden transition-transform hover:scale-105 cursor-pointer"
             >
-              <div className="relative pb-[100%] group"> {/* Made square aspect ratio consistent */}
+              <div onClick={() => navigate(`/product/${product.id}`)} className="cursor-pointer">
                 <img
-                  src={`${product?.Product_Images[0]?.image_path}`}
+                  src={`${product?.Product_Images[0]?.image_path || 'https://img.freepik.com/free-vector/realistic-round-box-mockup_52683-87713.jpg?semt=ais_hybrid&w=740'}`}
                   alt={product.name}
-                  className="absolute top-0 left-0 w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                  className="object-contain h-60 w-full"
                 />
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-bold text-gray-800 mb-2 truncate">
-                  {product.name}
-                </h3>
-                <p className="text-gray-600 text-sm line-clamp-2 mb-3 h-10"> {/* Fixed height for description */}
-                  {product.description}
-                </p>
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-xl font-bold text-green-600">
-                    ₹{product.price.toLocaleString('en-IN')} {/* Added proper number formatting */}
-                  </span>
-                  <span className={`text-sm font-medium px-2 py-1 rounded-full ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-                  </span>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold truncate">{product.name}</h3>
+                  <p className="text-gray-600 text-sm line-clamp-2">{product.description}</p>
+                  <p className="text-xl text-green-600 font-semibold">₹{product.price}</p>
+                  <p className="text-xs text-gray-500 font-semibold">Stock: {product.stock}</p>
                 </div>
-                <button
-                  onClick={() => addToCart(product, 1)}
-                  disabled={product.stock === 0}
-                  className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 ${product.stock === 0
-                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white transform hover:-translate-y-0.5'
-                    }`}
-                >
-                  {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                </button>
               </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCart(product, 1);
+                }}
+                className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
+              >
+                Add to Cart
+              </button>
             </div>
           ))}
         </div>

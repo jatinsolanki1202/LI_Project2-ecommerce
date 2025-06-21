@@ -189,7 +189,7 @@ const Cart = () => {
               <p>Total Items: <span className="font-semibold">{totalQuantity}</span></p>
               <p>Total Amount: <span className="font-bold text-green-600">₹{totalAmount.toFixed(2)}</span></p>
             </div>
-            <button onClick={handleCheckout} className="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-lg">
+            <button onClick={handleCheckout} className="w-full md:w-auto bg-black hover:bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg">
               Checkout
             </button>
           </div>
