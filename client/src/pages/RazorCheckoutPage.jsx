@@ -1196,7 +1196,7 @@ const RazorCheckoutPage = () => {
                     <div key={item.id} className="flex justify-between items-center py-3 border-b">
                       <div className="flex items-center space-x-4">
                         <img
-                          src={`${item.Product.Product_Images?.[0]?.image_path}`}
+                          src={`${item.Product.Product_Images?.[0]?.image_path || 'https://img.freepik.com/free-vector/realistic-round-box-mockup_52683-87713.jpg?semt=ais_hybrid&w=740'}`}
                           alt={item.Product?.name}
                           className="w-16 h-16 object-cover rounded-md"
                         />

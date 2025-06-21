@@ -164,7 +164,7 @@ const Cart = () => {
             {cartItems.map(item => (
               <div key={item.product_id} className="flex flex-col md:flex-row items-center justify-between bg-white p-4 rounded-lg shadow-md space-y-4 md:space-y-0">
                 <div className="flex items-center space-x-4 w-full md:w-2/3">
-                  <img src={item.Product.Product_Images[0]?.image_path} alt={item.Product.name} className="h-20 w-20 object-contain rounded-md" />
+                  <img src={item.Product.Product_Images[0]?.image_path || 'https://img.freepik.com/free-vector/realistic-round-box-mockup_52683-87713.jpg?semt=ais_hybrid&w=740'} alt={item.Product.name} className="h-20 w-20 object-contain rounded-md" />
                   <div className="flex-1">
                     <h2 className="text-lg font-semibold">{item.Product.name}</h2>
                     <p className="text-gray-600">₹{Number(item.Product.price).toFixed(2)} each</p>

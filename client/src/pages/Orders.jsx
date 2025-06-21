@@ -85,7 +85,7 @@ const OrdersPage = () => {
                                                 className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-4"
                                             >
                                                 <img
-                                                    src={image}
+                                                    src={image || 'https://img.freepik.com/free-vector/realistic-round-box-mockup_52683-87713.jpg?semt=ais_hybrid&w=740'}
                                                     alt={product.name}
                                                     className="w-20 h-20 object-contain rounded"
                                                 />
