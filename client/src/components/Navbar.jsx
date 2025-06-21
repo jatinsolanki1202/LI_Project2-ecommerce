@@ -11,9 +11,12 @@ import dropdownIcon from '../assets/images/dropdown_icon.png';
 import { CartContext } from "../context/CartContext.jsx";
 import SearchBar from "./SearchBar.jsx";
 import toast from "react-hot-toast";
+import { useRef } from "react";
 
 const Navbar = () => {
   const { token, setToken, fetchToken } = useContext(storeContext);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const { cart, fetchCart, cartLength } = useContext(CartContext)
   const [visible, setVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
@@ -90,6 +93,20 @@ const Navbar = () => {
     checkIsAdmin()
   }, [])
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   useEffect(() => {
     fetchCart()
     checkLogin()
@@ -153,26 +170,46 @@ const Navbar = () => {
             onClose={() => setIsSearchOpen(false)}
           />
           {/* Profile Dropdown */}
-          <div className="group relative">
-            <img src={profileIcon} className="w-5 cursor-pointer" alt="Profile" />
+          <div className="relative" ref={dropdownRef}>
+            <img
+              src={profileIcon}
+              className="w-5 cursor-pointer"
+              alt="Profile"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            />
 
-            <div className="group-hover:block hidden absolute dropdown-menu right-0 top-2 pt-4">
-              <div className="flex flex-col gap-2 py-3 px-5 w-36 bg-slate-100 text-gray-500 rounded-lg shadow-lg">
-                {isLoggedIn ? (
-                  <>
-                    <p className="cursor-pointer hover:text-black" onClick={() => navigate('/cart')}>Cart</p>
-                    <p className="cursor-pointer hover:text-black" onClick={() => navigate('/orders')}>Orders</p>
-                    <p className="cursor-pointer hover:text-black" onClick={handleLogout}>
-                      Logout
-                    </p>
-                  </>
-                ) : (
-                  <Link to="/user/login" className="cursor-pointer hover:text-black">
-                    Login
-                  </Link>
-                )}
+            {isDropdownOpen && (
+              <div className="absolute dropdown-menu right-0 top-2 pt-4">
+                <div className="flex flex-col gap-2 py-3 px-5 w-36 bg-slate-100 text-gray-500 rounded-lg shadow-lg">
+                  {isLoggedIn ? (
+                    <>
+                      <p className="cursor-pointer hover:text-black" onClick={() => {
+                        navigate('/cart');
+                        setIsDropdownOpen(false);
+                      }}>Cart</p>
+                      <p className="cursor-pointer hover:text-black" onClick={() => {
+                        navigate('/profile');
+                        setIsDropdownOpen(false);
+                      }}>Profile</p>
+                      <p className="cursor-pointer hover:text-black" onClick={() => {
+                        navigate('/orders');
+                        setIsDropdownOpen(false);
+                      }}>Orders</p>
+                      <p className="cursor-pointer hover:text-black" onClick={() => {
+                        handleLogout();
+                        setIsDropdownOpen(false);
+                      }}>
+                        Logout
+                      </p>
+                    </>
+                  ) : (
+                    <Link to="/user/login" className="cursor-pointer hover:text-black" onClick={() => setIsDropdownOpen(false)}>
+                      Login
+                    </Link>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Cart */}

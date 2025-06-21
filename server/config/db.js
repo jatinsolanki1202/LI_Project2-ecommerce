@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import dotenv from "dotenv";
+import mysql from 'mysql2'
 dotenv.config();
 
 // const sequelize = mysql.createPool({
@@ -7,10 +8,10 @@ dotenv.config();
 //   user: process.env.DB_USERNAME,
 //   password: process.env.DB_PASSWORD,
 //   database: process.env.DB_DATABASE,
-//   ssl: {
-//     rejectUnauthorized: true, // Ensures secure connection
-//     ca: fs.readFileSync(process.env.CA), // Read SSL certificate file
-//   },
+  // ssl: {
+  //   rejectUnauthorized: true, // Ensures secure connection
+  //   ca: fs.readFileSync(process.env.CA), // Read SSL certificate file
+  // },
 // })
 
 

@@ -519,6 +519,21 @@ const getAllOrders = async (req, res) => {
   }
 }
 
+const getUserProfile = async (req, res) => {
+  try {
+    console.log("reqq here");
+    
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user });
+  } catch (error) {
+    console.error("Error getting profile:", error.message);
+    res.json({ success: false, message: "Failed to fetch user profile" });
+  }
+};
 
 export {
   createUser,
@@ -531,5 +546,6 @@ export {
   getAddresses,
   handleCodOrderPlacing,
   handleAddAddress,
-  getAllOrders
+  getAllOrders,
+  getUserProfile
 };
