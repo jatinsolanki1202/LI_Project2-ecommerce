@@ -9,6 +9,10 @@ import { createToken } from "../utils/jwt.js";
 import categoryModel from "../models/Category.js";
 import ProductImage from "../models/ProductImage.js";
 import cloudinary from "../config/cloudinary.js";
+import Order from "../models/Order.js";
+import OrderItem from "../models/OrderItem.js";
+import { User } from "../models/index.js";
+import Address from "../models/Address.js";
 
 const handleAdminLogin = async (req, res) => {
   try {
@@ -274,6 +278,50 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.findAll({
+      include: [
+        { model: User, attributes: ['id', 'name', 'email', 'role'],include: [
+        {
+          model: Address,
+          attributes: ['id', 'user_id', 'phone', 'address1', 'address2', 'zip', 'country', 'city', 'state'] 
+          // tweak attribute names to match your Address model
+        }
+      ] },
+        {
+          model: OrderItem,
+          attributes: ['id', 'product_id', 'product_name', 'quantity', 'price'],
+          // To include product images or other product details, nest:
+          // include: [{ model: Product, attributes: ['id', 'name', 'description'] }]
+        }
+      ],
+      order: [['created_at', 'DESC']],
+    });
+    res.json({ orders });
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const updateOrderStatus = async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+  try {
+    const order = await Order.findByPk(orderId);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    order.delivery_status = status;
+    await order.save();
+
+    res.json({ message: 'Order status updated', order });
+  } catch (err) {
+    console.error('Error updating order status:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export {
   addProduct,
   deleteProduct,
@@ -283,5 +331,7 @@ export {
   createCategory,
   editCategory,
   deleteCategory,
-  getAllProducts
+  getAllProducts,
+  getAllOrders,
+  updateOrderStatus
 }

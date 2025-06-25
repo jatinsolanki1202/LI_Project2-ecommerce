@@ -19,6 +19,7 @@ import RazorCheckoutPage from './pages/RazorCheckoutPage.jsx'
 import AdminCategoryPage from './pages/AdminCategoryPage.jsx'
 import Orders from './pages/Orders.jsx'
 import UserProfile from './pages/UserProfile.jsx'
+import AdminOrdersManagement from './pages/AdminOrdersManagement.jsx'
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
           <Route path='/admin/login' element={<AdminLogin />} />
           <Route path='/admin/products' element={<AdminProductPage />} />
           <Route path='/admin/categories' element={<AdminCategoryPage />} />
+          <Route path='/admin/orders' element={<AdminOrdersManagement />} />
           <Route path='/about' element={<About />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/product/:id' element={<ProductDetails />} />

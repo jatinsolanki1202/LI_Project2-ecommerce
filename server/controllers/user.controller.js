@@ -289,8 +289,6 @@ const handleCheckOut = async (req, res) => {
       ],
     });
 
-    console.log(JSON.stringify(cart, null, 2), " checkoutApi");
-
     if (cart.CartItems.length < 1) {
       return res.json({
         success: false,

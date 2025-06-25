@@ -200,11 +200,11 @@ const LoginPage = () => {
             <>
               <div className="space-y-2">
                 <input type="email" name="email" placeholder="Email" required onChange={handleInputChange} className={getInputClass("email")} />
-                {formErrors.email && <span className="text-red-500 text-sm">{formErrors.email}</span>}
+                {/* {formErrors.email && <span className="text-red-500 text-sm">{formErrors.email}</span>} */}
               </div>
               <div className="space-y-2">
                 <input type="password" name="password" placeholder="Password" required onChange={handleInputChange} className={getInputClass("password")} />
-                {formErrors.password && <span className="text-red-500 text-sm">{formErrors.password}</span>}
+                {/* {formErrors.password && <span className="text-red-500 text-sm">{formErrors.password}</span>} */}
               </div>
             </>
           )}

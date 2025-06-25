@@ -1,5 +1,5 @@
 import express from 'express'
-import { addProduct, deleteProduct, editProduct, fetchCategory, handleAdminLogin, createCategory, editCategory, deleteCategory, getAllProducts } from '../controllers/admin.controller.js'
+import { addProduct, deleteProduct, editProduct, fetchCategory, handleAdminLogin, createCategory, editCategory, deleteCategory, getAllProducts, getAllOrders, updateOrderStatus } from '../controllers/admin.controller.js'
 import { body, check } from 'express-validator'
 import adminAuth from '../middlewares/adminAuth.js'
 import loginAuth from '../middlewares/loginAuth.js'
@@ -33,4 +33,11 @@ router.delete('/category/:categoryId', deleteCategory)
 router.post('/delete-product/:productId', loginAuth, adminAuth('admin'), deleteProduct)
 router.put('/edit-product/:productId', loginAuth, adminAuth('admin'), upload.array("images"), editProduct)
 router.get('/products', loginAuth, adminAuth('admin'), getAllProducts)
+
+// GET /admin/orders - list all orders with user and order items
+router.get('/orders', loginAuth, adminAuth('admin'), getAllOrders);
+
+// PUT /admin/orders/:orderId/status - update order status
+router.put('/orders/:orderId/status', loginAuth, adminAuth('admin'), updateOrderStatus);
+
 export default router

@@ -248,11 +248,6 @@ const AdminPanel = () => {
     revenueSum += Number(order.total_amount)
   }
 
-  useEffect(() => {
-    console.log('Date Range:', { startDate, endDate });
-    console.log('Filtered Orders:', orders?.filter(order => isDateInRange(order.created_at)));
-  }, [startDate, endDate, orders]);
-
   return (
     <div className="flex bg-gray-100">
       {/* Sidebar */}
